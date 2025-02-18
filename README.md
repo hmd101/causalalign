@@ -73,16 +73,29 @@ The study compares human judgments with four LLMs (**GPT-4o, GPT-3.5, Claude-3-O
 
 ![alt text](image-1.png)
 
-The results show:
 
-- **Claude-3-Opus and GPT-4o** were the most **normative**, showing strong **explaining away** behavior.
-- **GPT-3.5 and Gemini-Pro** exhibited more **associative biases**, resembling human errors.
-- LLMs often **overestimated causal strengths** compared to human participants.
-- LLMs relied more on **domain knowledge** than humans, sometimes leading to **non-normative responses**.
+### **Causal Reasoning Varies Across LLMs and Humans**
+
+We found that:
+
+- **GPT-4o and Claude-3** demonstrated the most **normative reasoning**, adhering more closely to probability theory than human participants.
+- **Gemini-Pro and GPT-3.5** leaned towards **associative reasoning**, relying on statistical correlations rather than strict causal logic.
+- All models **deviated from expected causal independence**, but **Claude-3 exhibited the least bias**, making its responses the most mathematically consistent.
+
+Interestingly, humans rely on **heuristics** that sometimes contradict pure probability theory. For example, the **"explaining away" effect**—where observing one cause makes another less likely—was recognized by AI models but **handled inconsistently**, depending on their training data.
+
+### **AI and Humans Approach Causality Differently**
+
+A key takeaway is that LLMs do not simply **replicate** human causal reasoning -- it **follows a different logic**, possibly due to applying domain knowledge-
+
+- While human judgments remained relatively **stable** across different domains, AI models **adapted their reasoning** based on the specific context (e.g., economics vs. sociology).
+- **GPT-4o treated causal relationships as most deterministic**, assuming that certain causes always lead to specific effects, especially in the economy domain for diagnostic reasoning types (E=0).
+- Humans, on the other hand, **embrace uncertainty**, recognizing that possibly other caues, not stated in the prompt may have influence. An alternative explanation could be "lazy reasoning", defaulting to what the experimental setup had set as default (here, 50, where humans were supposed to move a slider on a range from 0-100 when providing their likelihood judgments).
+
 
 ![alt text](image.png)
 
-
+We find that LLMs generally can do the causal inference task and follow relatively similar reasoning patterns as humans do. However, there are domain- and task-speicific differences. 
 This work underscores the need to evaluate LLMs’ reasoning **beyond pattern recognition**, ensuring they make **reliable causal inferences** in **real-world applications**.
 
 For more details, refer to the full paper: [[arXiv:2502.10215]](https://arxiv.org/pdf/2502.10215).
