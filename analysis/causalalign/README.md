@@ -2,7 +2,7 @@
 
 ## **Overview**
 
-**CausalAlign** is a Python package designed to evaluate the causal reasoning abilities of **Large Language Models (LLMs)** in comparison to **human inference**. It provides tools to systematically assess how LLMs reason about causal structures—particularly **collider graphs** — and whether their judgments align with normative Bayesian inference or human reasoning biases.
+**CausalAlign** is a Python package designed to evaluate the causal reasoning abilities of **Large Language Models (LLMs)** in comparison to **human inference**. It provides tools to systematically assess how LLMs reason about causal structures—particularly **collider graphs** — and to which extent their judgments fall on the spectrum between  normative Bayesian inference,  human-like reasoning and randomness.
 
 This package is based on the work presented in the paper:
 
@@ -67,7 +67,7 @@ It includes built-in support for:
 
 Large Language Models (LLMs) have demonstrated impressive reasoning capabilities, but do they **reason causally like humans**? This study investigates whether LLMs exhibit **human-like causal reasoning**, whether they follow **normative Bayesian inference**, or whether they introduce **unique biases**.
 
-The study compares human judgments with four LLMs (**GPT-4o, GPT-3.5, Claude-3-Opus, and Gemini-Pro**) on **causal inference tasks** based on **collider structures** (e.g., `C1 → E ← C2`) embedded in three different knowledge domains (economy, sociology, meteorology) based on the cover stories introduced in Rehder & Waldmann /2017:
+The study compares human judgments with four LLMs (**GPT-4o, GPT-3.5, Claude-3-Opus, and Gemini-Pro**) on **causal inference tasks** based on **collider structures** (e.g., `C1 → E ← C2`) embedded in three different knowledge domains (economy, sociology, meteorology) based on the cover stories introduced in Rehder & Waldmann (2017):
 
 
 
