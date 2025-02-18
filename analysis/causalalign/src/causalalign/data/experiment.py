@@ -1,0 +1,251 @@
+import os
+
+"""
+ExperimentRunner is a class designed to manage and execute experiments involving 
+large language models (LLMs). It handles the setup of experiment configurations, 
+processes input files, generates responses using specified LLMs, logs initial 
+responses, and saves the results.
+
+Experiment runner can be executed in main.py file under causalalign/src/causalalign/main.py
+
+Attributes:
+    provider_configs (Dict[str, LLMConfig]): A dictionary containing configurations 
+        for different LLM providers.
+    version (str): The version identifier for the experiment.
+    cot (bool): A flag indicating whether to use chain-of-thought (CoT) prompting.
+    n_times (int): The number of times to repeat the prompts.
+    run_id (str): A unique identifier for the experiment run.
+    version_flag (str): A flag indicating the version of the experiment.
+    log_file (str): The file path for logging initial responses.
+    init_log (pd.DataFrame): A DataFrame to store initial responses.
+    input_path (str): The path to the input files.
+    results_folder (str): The path to the folder where results will be saved.
+
+Methods:
+    _setup_results_folder() -> str:
+        Sets up the results folder based on the version and CoT flag.
+    
+    _load_or_create_log() -> pd.DataFrame:
+        Loads the log file if it exists, otherwise creates a new log DataFrame.
+    
+    process_file(input_file: str, subfolder: str, llm_client: BaseLLMClient, temperature_value: float):
+        Processes a single input file, generates responses using the specified LLM, 
+        and logs the results.
+    
+    _log_response(input_file: str, init_response: str, model_name: str, temperature: float, subfolder: str, prompt_type: str):
+        Logs the initial response for a given input file.
+    
+    _save_results(results: list, cnt_cond: str, model_name: str, subfolder: str, temperature: float, input_file: str):
+        Saves the generated responses to a CSV file.
+    
+    run(sub_folder_xs: list, temperature_value_xs: list):
+        Runs the experiment for the specified subfolders and temperature values.
+"""
+import time
+import uuid
+from datetime import datetime
+from typing import Dict
+
+import pandas as pd
+
+from ..llm.client import BaseLLMClient, LLMConfig, create_llm_client
+
+
+# In causalalign/src/causalalign/data/experiment.py
+class ExperimentRunner:
+    def __init__(
+        self,
+        provider_configs: Dict[str, LLMConfig],
+        version: str = "1_v",
+        cot: bool = False,
+        n_times: int = 5,
+    ):
+        self.provider_configs = provider_configs
+        self.version = version
+        self.cot = cot
+        self.n_times = n_times
+        self.run_id = str(uuid.uuid4())
+        self.version_flag = "1_experiment"
+        self.log_file = "init_responses_log.csv"
+        self.init_log = self._load_or_create_log()
+
+        # Update paths to be relative to the data directory
+        current_dir = os.path.dirname(
+            os.path.abspath(__file__)
+        )  # Gets the experiment.py directory
+        self.input_path = os.path.join(
+            current_dir, "17_rehder_wes_datasets", "prompts_only"
+        )
+        self.results_folder = self._setup_results_folder()
+
+    def _setup_results_folder(self) -> str:
+        base_folder = os.path.join(
+            os.path.dirname(self.input_path), "results", self.version
+        )
+        if self.cot:
+            base_folder += "_cot"
+        os.makedirs(base_folder, exist_ok=True)
+        return base_folder
+
+    def _load_or_create_log(self) -> pd.DataFrame:
+        if os.path.exists(self.log_file):
+            return pd.read_csv(self.log_file, sep=";")
+        return pd.DataFrame(columns=["file_name", "init_response"])
+
+    # def _setup_results_folder(self) -> str:
+    #     base_folder = f"17_rehder_wes_datasets/results/{self.version}"
+    #     if self.cot:
+    #         base_folder += "_cot"
+    #     os.makedirs(base_folder, exist_ok=True)
+    #     return base_folder
+
+    def process_file(
+        self,
+        input_file: str,
+        subfolder: str,
+        llm_client: BaseLLMClient,
+        temperature_value: float,
+    ):
+        print(
+            f"Processing {input_file} with model {llm_client.model_name} at temperature {temperature_value}"
+        )
+
+        cnt_cond = input_file.split("_")[2]
+        prompt_type = input_file.split("_")[3]
+
+        # Create base prompt
+        unique_prompt = (
+            "In the following, you will be presented with different cause and effect relationships, "
+            "a set of observations, and an inference task. Your task is to estimate the exact likelihood "
+            "between 0 and 100 (where 0 means very unlikely and 100 means very likely) based on the "
+            "cause-effect relationships and observations you are presented with."
+        )
+
+        if self.cot:
+            unique_prompt += (
+                " Explain your reasoning step by step tags <cot> </cot> and state all the assumptions "
+                "you're making. For example, you could say: 'I think that the likelihood of the question "
+                "is ... because ...'. Within the tags <cot> </cot>, introduce fitting tags such as for "
+                "assumptions <assumptions> </assumptions>."
+            )
+
+        # Get initial response
+        try:
+            init_response = llm_client.generate_response(
+                unique_prompt, temperature_value
+            ).content
+            print(f"Initialization response for {input_file}: {init_response}")
+        except Exception as e:
+            print(f"Error sending initialization prompt for file {input_file}: {e}")
+            init_response = f"Error: {e}"
+
+        # Log the initialization response
+        self._log_response(
+            input_file,
+            init_response,
+            llm_client.model_name,
+            temperature_value,
+            subfolder,
+            prompt_type,
+        )
+
+        # Process prompts
+        input_file_path = os.path.join(self.input_path, subfolder)
+        input_file_path = input_file_path + "/"
+        print(f"Processing prompts from {input_file_path}{input_file}")
+        df = pd.read_csv(os.path.join(input_file_path, input_file), delimiter=";")
+        df = pd.concat([df] * self.n_times, ignore_index=True)
+        df.rename(columns={df.columns[-1]: "prompt"}, inplace=True)
+
+        results = []
+        for index, row in df.iterrows():
+            try:
+                response = llm_client.generate_response(
+                    row["prompt"], temperature_value
+                )
+                results.append({"id": row["id"], "response": response.content})
+                print(f"Processed prompt {index + 1}/{len(df)} from file {input_file}")
+            except Exception as e:
+                print(f"Error at index {index} in file {input_file}: {e}")
+                results.append({"id": row["id"], "response": f"Error: {e}"})
+            time.sleep(1)  # Rate limiting
+
+        # Save results
+        self._save_results(
+            results,
+            cnt_cond,
+            llm_client.model_name,
+            subfolder,
+            temperature_value,
+            input_file,
+        )
+
+    def _log_response(
+        self,
+        input_file: str,
+        init_response: str,
+        model_name: str,
+        temperature: float,
+        subfolder: str,
+        prompt_type: str,
+    ):
+        log_entry = pd.DataFrame(
+            [
+                {
+                    "file_name": input_file,
+                    "init_response": init_response,
+                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "run_id": self.run_id,
+                    "version_flag": self.version_flag,
+                    "model": model_name,
+                    "temperature": temperature,
+                    "type": subfolder,
+                    "prompt_type": prompt_type,
+                }
+            ]
+        )
+        self.init_log = pd.concat([self.init_log, log_entry], ignore_index=True)
+        self.init_log.to_csv(self.log_file, index=False, sep=";")
+
+    def _save_results(
+        self,
+        results: list,
+        cnt_cond: str,
+        model_name: str,
+        subfolder: str,
+        temperature: float,
+        input_file: str,
+    ):
+        folder_path = os.path.join(
+            os.getcwd(), self.results_folder, model_name, subfolder
+        )
+        os.makedirs(folder_path, exist_ok=True)
+
+        file_name = (
+            f"{self.version}_{cnt_cond}_{model_name}_type_{subfolder}"
+            f"_responses_temp_{temperature}"
+        )
+        if self.cot:
+            file_name += "_cot"
+        file_name += ".csv"
+
+        file_path = os.path.join(folder_path, file_name)
+        response_df = pd.DataFrame(results)
+        response_df["subject"] = model_name
+        response_df["temperature"] = temperature
+        response_df.to_csv(file_path, index=False, sep=";")
+        print(f"Responses saved to {file_path}")
+
+    def run(self, sub_folder_xs: list, temperature_value_xs: list):
+        for subfolder in sub_folder_xs:
+            subfolder_path = os.path.join(self.input_path, subfolder)
+            subfolder_path = subfolder_path + "/"
+            input_files = [f for f in os.listdir(subfolder_path) if f.endswith(".csv")]
+
+            for input_file in input_files:
+                for temperature_value in temperature_value_xs:
+                    for provider, config in self.provider_configs.items():
+                        llm_client = create_llm_client(config)
+                        self.process_file(
+                            input_file, subfolder, llm_client, temperature_value
+                        )

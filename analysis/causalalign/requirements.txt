@@ -1,0 +1,14 @@
+# Core
+numpy
+torch
+pytest
+
+# Plotting and analysis
+jupyter
+pandas
+matplotlib
+sklearn
+tueplots
+seaborn
+networkx
+statsmodels
