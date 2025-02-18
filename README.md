@@ -58,7 +58,7 @@ CausalAlign provides support for evaluating LLMs across different causal inferen
 It includes built-in support for:
 
 - **Human data from Rehder & Waldmann (2017), experiment 1, model-only condition**
-- **LLM inference responses (GPT-4o, GPT-3.5, Claude, Gemini)**
+- **LLM inference responses (GPT-4o, GPT-3.5, Claude-3-Opus, and Gemini-Pro)**
 
 ## **Some Benchmarking Results:**
 
