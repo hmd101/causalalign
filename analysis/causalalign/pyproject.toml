@@ -24,7 +24,7 @@ dynamic = ["version"]
 plotting = ["matplotlib>=3.4.3"]
 
 [project.urls]
-github = "https://github.com/hmd101/llm-causality"
+github = "https://github.com/hmd101/causalalign"
 
 ################################################################################
 # PEP 518 Build System Configuration                                           #

@@ -12,6 +12,9 @@ from sklearn.linear_model import LinearRegression
 
 MixedLM = mlm.MixedLM
 
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
 # from statsmodels.stats.multicomp import MultiComparison
 from statsmodels.regression.mixed_linear_model import MixedLM
 from statsmodels.stats.multicomp import MultiComparison
@@ -62,7 +65,7 @@ class CausalReasoningAnalysis:
 
     ##############################################
 
-    ### 3. Statistical tests
+    ### Statistical tests
 
     def perform_statistical_tests(self, marginalize_temperature=False, alpha=0.05):
         """Perform Kruskal-Wallis tests comparing human and LLM responses."""
@@ -119,9 +122,7 @@ class CausalReasoningAnalysis:
 
         return pd.DataFrame(results)
 
-    ### 4. Effect sizes
-
-    #
+    ### Effect sizes
 
     def compute_effect_sizes(
         self, statistical_results, alpha=0.05, effect_size_type="cohen_d"
@@ -701,26 +702,14 @@ class CausalReasoningAnalysis:
         )
         pivot_agent.plot(kind="bar", ax=ax1)
         ax1.set_title("Violation Rates by agent and Test Type")
-        ax1.set_ytask("Violation Rate")
+        ax1.set_ylabel("Violation Rate")
 
         # 2. Violation rates by task
         ax2 = fig.add_subplot(gs[0, 1])
         df_results.groupby("task")["violation"].mean().plot(kind="bar", ax=ax2)
         ax2.set_title("Violation Rates by Task")
-        ax2.set_ytask("Violation Rate")
+        ax2.set_ylabel("Violation Rate")
         plt.xticks(rotation=45)
-
-        # 3. Heatmap of violations
-        ax3 = fig.add_subplot(gs[1, :])
-        pivot_heatmap = pd.pivot_table(
-            df_results,
-            values="violation",
-            index=["agent", "task"],
-            columns="test_type",
-            aggfunc="mean",
-        )
-        sns.heatmap(pivot_heatmap, annot=True, cmap="YlOrRd", ax=ax3)
-        ax3.set_title("Violation Patterns Across agents and Tasks by test type, mean")
 
         plt.tight_layout()
         return fig
@@ -809,8 +798,6 @@ class CausalReasoningAnalysis:
 
     def plot_domain_comparison_results(self, results, LLM, task=None):
         """Create interactive visualization of domain comparison results with error checking"""
-        import plotly.graph_objects as go
-        from plotly.subplots import make_subplots
 
         # Validate inputs
         # if LLM not in results:
@@ -903,53 +890,6 @@ class CausalReasoningAnalysis:
         )
 
         return fig
-
-    def generate_text_report(self, results, agent, task=None):
-        """Generate detailed text report of domain comparison results"""
-        tasks = [task] if task else list(results[agent].keys())
-        report_lines = []
-
-        report_lines.append(f"Analysis Report for {agent}")
-        report_lines.append("=" * 50)
-
-        for task in tasks:
-            task_results = results[agent][task]
-
-            # Task header
-            report_lines.append(f"\nTask {task}:")
-            report_lines.append("-" * 20)
-
-            # Test details
-            report_lines.append(
-                f"Test used: {task_results['test_used']} "
-                f"(assumptions violated: "
-                f"normality={task_results['assumptions_violated']['normality']}, "
-                f"variance={task_results['assumptions_violated']['variance']})"
-            )
-
-            # Overall significance
-            report_lines.append(
-                f"Overall significance: "
-                f"{'significant' if task_results['significant'] else 'not significant'} "
-                f"(p={task_results['p_value']:.2e})"
-            )
-
-            # Domain means
-            report_lines.append("\nDomain means:")
-            for domain, mean in task_results["domain_means"].items():
-                report_lines.append(f"  {domain}: {mean:.3f}")
-
-            # Post-hoc comparisons
-            if "posthoc" in task_results:
-                report_lines.append("\nPairwise comparisons:")
-                for comparison in task_results["posthoc"]:
-                    sig_marker = "*" if comparison["significant"] else ""
-                    report_lines.append(
-                        f"  {comparison['comparison']}: "
-                        f"p={comparison['adjusted_p']:.2e}{sig_marker}"
-                    )
-
-        return "\n".join(report_lines)
 
     def export_results_to_excel(self, results, filename):
         """Export results to Excel with multiple sheets for different aspects"""
@@ -1246,6 +1186,7 @@ class CausalReasoningAnalysis:
 
     ###### end correlation analysis
 
+    # Temperature Analysis
     def plot_temperature_correlations(self, correlation_results):
         """Visualize correlation results across temperatures"""
         fig = plt.figure(figsize=(15, 10))
@@ -1263,7 +1204,7 @@ class CausalReasoningAnalysis:
             ax=ax1,
         )
         ax1.set_title("Correlation with Human Responses vs Temperature")
-        ax1.set_ytask("Correlation Coefficient")
+        ax1.set_ylabel("Correlation Coefficient")
 
         # 2. Significance vs Temperature
         ax2 = fig.add_subplot(gs[0, 1])
@@ -1278,15 +1219,15 @@ class CausalReasoningAnalysis:
             ax=ax2,
         )
         ax2.set_title("Correlation Significance vs Temperature")
-        ax2.set_ytask("-log10(p-value)")
-        ax2.axhline(-np.log10(0.05), color="r", linestyle="--", task="p=0.05")
+        ax2.set_ylabel("-log10(p-value)")
+        ax2.axhline(-np.log10(0.05), color="r", linestyle="--", label="p=0.05")
         ax2.legend()
 
         # 3. Sample size vs Temperature
         ax3 = fig.add_subplot(gs[1, :])
         sns.barplot(data=correlation_results, x="Temperature", y="N", hue="LLM", ax=ax3)
         ax3.set_title("Sample Size by Temperature")
-        ax3.set_ytask("Number of Matched Responses")
+        ax3.set_ylabel("Number of Matched Responses")
 
         plt.tight_layout()
         return fig
@@ -1456,13 +1397,13 @@ class CausalReasoningAnalysis:
         fig = plt.figure(figsize=(15, 12))
         gs = plt.GridSpec(3, 2)
 
-        # 1. R² vs Temperature
+        # 1. R^2 vs Temperature
         ax1 = fig.add_subplot(gs[0, 0])
         sns.scatterplot(
             data=regression_results, x="Temperature", y="R2", hue="LLM", s=100, ax=ax1
         )
         ax1.set_title("R² vs Temperature")
-        ax1.set_ytask("R² Score")
+        ax1.set_ylabel("R² Score")
 
         # 2. RMSE vs Temperature
         ax2 = fig.add_subplot(gs[0, 1])
@@ -1470,7 +1411,7 @@ class CausalReasoningAnalysis:
             data=regression_results, x="Temperature", y="RMSE", hue="LLM", s=100, ax=ax2
         )
         ax2.set_title("RMSE vs Temperature")
-        ax2.set_ytask("Root Mean Square Error")
+        ax2.set_ylabel("Root Mean Square Error")
 
         # 3. Slope vs Temperature
         ax3 = fig.add_subplot(gs[1, 0])
@@ -1483,8 +1424,8 @@ class CausalReasoningAnalysis:
             ax=ax3,
         )
         ax3.set_title("Regression Slope vs Temperature")
-        ax3.set_ytask("Slope")
-        ax3.axhline(1.0, color="r", linestyle="--", task="y=x line")
+        ax3.set_ylabel("Slope")
+        ax3.axhline(1.0, color="r", linestyle="--", label="y=x line")
         ax3.legend()
 
         # 4. Intercept vs Temperature
@@ -1498,15 +1439,15 @@ class CausalReasoningAnalysis:
             ax=ax4,
         )
         ax4.set_title("Regression Intercept vs Temperature")
-        ax4.set_ytask("Intercept")
-        ax4.axhline(0, color="r", linestyle="--", task="y=x line")
+        ax4.set_ylabel("Intercept")
+        ax4.axhline(0, color="r", linestyle="--", label="y=x line")
         ax4.legend()
 
         # 5. Sample size vs Temperature
         ax5 = fig.add_subplot(gs[2, :])
         sns.barplot(data=regression_results, x="Temperature", y="N", hue="LLM", ax=ax5)
         ax5.set_title("Sample Size by Temperature")
-        ax5.set_ytask("Number of Matched Responses")
+        ax5.set_ylabel("Number of Matched Responses")
 
         plt.tight_layout()
         return fig
@@ -1531,7 +1472,7 @@ class CausalReasoningAnalysis:
         plt.figure(figsize=(12, 8))
 
         # Plot diagonal line for reference
-        plt.plot([0, 100], [0, 100], "k--", alpha=0.3, task="Perfect agreement")
+        plt.plot([0, 100], [0, 100], "k--", alpha=0.3, label="Perfect agreement")
 
         # Create color map for different LLMs
         unique_llms = regression_results["LLM"].unique()
@@ -1566,7 +1507,7 @@ class CausalReasoningAnalysis:
 
                     # Plot regression line
                     task = f"{llm} (T={row['Temperature']})"
-                    plt.plot(X, y, "-", color=color_dict[llm], task=task)
+                    plt.plot(X, y, "-", color=color_dict[llm], label=task)
 
                     if show_intervals:
                         # Compute intervals
@@ -1614,7 +1555,7 @@ class CausalReasoningAnalysis:
                                 y_pred.flatten() + t_crit * se_mean.flatten(),
                                 alpha=0.1,
                                 color=color_dict[llm],
-                                task=f"{task} CI",
+                                label=f"{task} CI",
                             )
 
                             # Plot prediction interval
@@ -1624,7 +1565,7 @@ class CausalReasoningAnalysis:
                                 y_pred.flatten() + t_crit * se_pred.flatten(),
                                 alpha=0.05,
                                 color=color_dict[llm],
-                                task=f"{task} PI",
+                                label=f"{task} PI",
                             )
 
                     # Plot actual data points
@@ -1636,8 +1577,8 @@ class CausalReasoningAnalysis:
                         s=30,
                     )
 
-        plt.xtask("Human Responses")
-        plt.ytask("LLM Responses")
+        plt.xlabel("Human Responses")
+        plt.ylabel("LLM Responses")
         plt.title(
             "Regression Comparison"
             + (f" (Temperature = {selected_temp})" if selected_temp is not None else "")
@@ -1646,158 +1587,6 @@ class CausalReasoningAnalysis:
         plt.grid(True, alpha=0.3)
 
         return plt.gcf()
-
-    #######################
-    # correlation and regression analysis by TASK
-
-    def regression_analysis_by_task(self, by_domain=False):
-        """Perform regression analysis by task instead of temperature"""
-        humans = self.data[self.data["agent"] == "humans"].copy()
-        results = []
-
-        match_columns = ["domain", "ppp", "task"]
-
-        for llm in [s for s in self.data["agent"].unique() if s != "humans"]:
-            llm_data = self.data[self.data["agent"] == llm].copy()
-
-            if by_domain:
-                domains = self.data["domain"].unique()
-            else:
-                domains = [None]
-
-            for domain in domains:
-                domain_filter = (
-                    (lambda x: x)
-                    if domain is None
-                    else (lambda x: x[x["domain"] == domain])
-                )
-
-                for task in sorted(self.data["task"].unique()):
-                    task_humans = domain_filter(humans[humans["task"] == task])
-                    task_llm = domain_filter(llm_data[llm_data["task"] == task])
-
-                    # Aggregate over temperatures by averaging responses
-                    task_llm = (
-                        task_llm.groupby(match_columns)["response"].mean().reset_index()
-                    )
-
-                    matched_data = pd.merge(
-                        task_humans[match_columns + ["response"]],
-                        task_llm[match_columns + ["response"]],
-                        on=match_columns,
-                        suffixes=("_human", "_llm"),
-                    )
-
-                    if len(matched_data) >= 2:
-                        X = matched_data["response_human"].values.reshape(-1, 1)
-                        y = matched_data["response_llm"].values
-                        model = LinearRegression()
-                        model.fit(X, y)
-
-                        predictions = model.predict(X)
-                        mse = np.mean((y - predictions) ** 2)
-                        rmse = np.sqrt(mse)
-
-                        result = {
-                            "LLM": llm,
-                            "Task": task,
-                            "R2": model.score(X, y),
-                            "Slope": model.coef_[0],
-                            "Intercept": model.intercept_,
-                            "MSE": mse,
-                            "RMSE": rmse,
-                            "N": len(matched_data),
-                        }
-
-                        if domain is not None:
-                            result["domain"] = domain
-
-                        results.append(result)
-
-        return pd.DataFrame(results)
-
-    def analyze_llm_human_correlation_by_task(self, by_domain=False, epsilon=1e-6):
-        """Analyze correlation between human and LLM responses by task"""
-        humans = self.data[self.data["agent"] == "humans"].copy()
-        results = []
-
-        match_columns = ["domain", "ppp", "task"]
-
-        for llm in [s for s in self.data["agent"].unique() if s != "humans"]:
-            llm_data = self.data[self.data["agent"] == llm].copy()
-
-            if by_domain:
-                domains = self.data["domain"].unique()
-            else:
-                domains = [None]
-
-            for domain in domains:
-                domain_filter = (
-                    (lambda x: x)
-                    if domain is None
-                    else (lambda x: x[x["domain"] == domain])
-                )
-
-                for task in sorted(self.data["task"].unique()):
-                    task_humans = domain_filter(humans[humans["task"] == task])
-                    task_llm = domain_filter(llm_data[llm_data["task"] == task])
-
-                    # Aggregate over temperatures
-                    task_llm = (
-                        task_llm.groupby(match_columns)["response"].mean().reset_index()
-                    )
-
-                    matched_data = pd.merge(
-                        task_humans[match_columns + ["response"]],
-                        task_llm[match_columns + ["response"]],
-                        on=match_columns,
-                        suffixes=("_human", "_llm"),
-                    )
-
-                    if len(matched_data) >= 3:
-                        _, h_pval = stats.shapiro(matched_data["response_human"])
-                        _, l_pval = stats.shapiro(matched_data["response_llm"])
-                        is_normal = h_pval > 0.05 and l_pval > 0.05
-                    else:
-                        is_normal = False
-
-                    # Add small epsilon if responses are all 0.0
-                    if matched_data["response_llm"].nunique() == 1 and matched_data[
-                        "response_llm"
-                    ].iloc[0] in [0.0, 1.0]:
-                        matched_data["response_llm"] += epsilon
-
-                    if matched_data["response_human"].nunique() == 1 and matched_data[
-                        "response_human"
-                    ].iloc[0] in [0.0, 1.0]:
-                        matched_data["response_human"] += epsilon
-
-                    if is_normal:
-                        corr, p = stats.pearsonr(
-                            matched_data["response_human"], matched_data["response_llm"]
-                        )
-                        method = "pearson"
-                    else:
-                        corr, p = stats.spearmanr(
-                            matched_data["response_human"], matched_data["response_llm"]
-                        )
-                        method = "spearman"
-
-                    result = {
-                        "LLM": llm,
-                        "Task": task,
-                        "Correlation": corr,
-                        "P_value": p,
-                        "Method": method,
-                        "N": len(matched_data),
-                    }
-
-                    if domain is not None:
-                        result["domain"] = domain
-
-                    results.append(result)
-
-        return pd.DataFrame(results)
 
     def export_comprehensive_task_analysis(self, reg_results, corr_results, filename):
         """Export comprehensive analysis with task-based results"""
@@ -1855,14 +1644,14 @@ class CausalReasoningAnalysis:
         overall_corr = correlation_results[~correlation_results.index.isnull()]
         sns.barplot(data=overall_corr, x="LLM", y="Correlation", ax=ax1)
         ax1.set_title("Overall Correlations by LLM")
-        ax1.set_ytask("Correlation Coefficient")
+        ax1.set_ylabel("Correlation Coefficient")
 
         # 2. Correlation significance
         ax2 = fig.add_subplot(gs[0, 1])
         sig_plot = -np.log10(correlation_results["P_value"])
         sns.barplot(data=correlation_results, x="LLM", y=sig_plot, ax=ax2)
         ax2.set_title("Correlation Significance (-log10 p-value)")
-        ax2.axhline(-np.log10(0.05), color="r", linestyle="--", task="p=0.05")
+        ax2.axhline(-np.log10(0.05), color="r", linestyle="--", label="p=0.05")
         ax2.legend()
 
         # 3. Correlation heatmap (if domain/task grouping exists)
@@ -1897,7 +1686,7 @@ class CausalReasoningAnalysis:
         ax1 = fig.add_subplot(gs[0, 0])
         sns.barplot(data=regression_results, x="LLM", y="R2", ax=ax1)
         ax1.set_title("R² Values by LLM")
-        ax1.set_ytask("R²")
+        ax1.set_ylabel("R²")
 
         # 2. Slope and intercept
         ax2 = fig.add_subplot(gs[0, 1])
@@ -2223,7 +2012,7 @@ class CausalReasoningAnalysis:
                 group["Human_Response"],
                 group["Predicted_LLM_Response"],
                 "-",
-                task=task,
+                label=task,
             )
 
             # Plot confidence intervals
@@ -2232,7 +2021,7 @@ class CausalReasoningAnalysis:
                 group["CI_Lower"],
                 group["CI_Upper"],
                 alpha=0.1,
-                task=f"{task} CI",
+                label=f"{task} CI",
             )
 
             # Plot prediction intervals
@@ -2241,14 +2030,14 @@ class CausalReasoningAnalysis:
                 group["PI_Lower"],
                 group["PI_Upper"],
                 alpha=0.05,
-                task=f"{task} PI",
+                label=f"{task} PI",
             )
 
         # Plot diagonal line for reference
-        plt.plot([0, 100], [0, 100], "k--", alpha=0.3, task="Perfect agreement")
+        plt.plot([0, 100], [0, 100], "k--", alpha=0.3, label="Perfect agreement")
 
-        plt.xtask("Human Response")
-        plt.ytask("Predicted LLM Response")
+        plt.xlabel("Human Response")
+        plt.ylabel("Predicted LLM Response")
         plt.title("Predicted LLM Responses with Confidence and Prediction Intervals")
         plt.legend()
         plt.grid(True, alpha=0.3)
@@ -3242,7 +3031,7 @@ class CausalReasoningAnalysis:
             domain_data = regression_results[regression_results["domain"] == domain]
 
             # Plot diagonal line
-            ax.plot([0, 100], [0, 100], "k--", alpha=0.3, task="Perfect agreement")
+            ax.plot([0, 100], [0, 100], "k--", alpha=0.3, label="Perfect agreement")
 
             # Plot regression lines for each LLM
             for llm in domain_data["LLM"].unique():
@@ -3256,10 +3045,10 @@ class CausalReasoningAnalysis:
                     y = row["Slope"] * x + row["Intercept"]
 
                     task = f"{llm} (T={row['Temperature']})"
-                    ax.plot(x, y, "-", task=task)
+                    ax.plot(x, y, "-", label=task)
 
-            ax.set_xtask("Human Responses")
-            ax.set_ytask("LLM Responses")
+            ax.set_xlabel("Human Responses")
+            ax.set_ylabel("LLM Responses")
             ax.set_title(f"Domain: {domain}")
             ax.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
             ax.grid(True, alpha=0.3)
@@ -3338,7 +3127,7 @@ class CausalReasoningAnalysis:
                 continue
 
             # Helper function for temperature analysis
-            def analyze_temp_effects(data, domain="All", task="All", level="overall"):
+            def analyze_temp_effects(data, domain="All", label="All", level="overall"):
                 if len(data) < 2:
                     return
 
@@ -3427,7 +3216,7 @@ class CausalReasoningAnalysis:
             if "Task" in metrics_df.columns:
                 for task in llm_data["Task"].unique():
                     task_data = llm_data[llm_data["Task"] == task]
-                    analyze_temp_effects(task_data, task=task, level="task")
+                    analyze_temp_effects(task_data, label=task, level="task")
 
                     # By domain and task
                     if "Domain" in metrics_df.columns:
@@ -3436,7 +3225,7 @@ class CausalReasoningAnalysis:
                             analyze_temp_effects(
                                 domain_task_data,
                                 domain=domain,
-                                task=task,
+                                label=task,
                                 level="domain_task",
                             )
 
@@ -3547,7 +3336,7 @@ class CausalReasoningAnalysis:
 
             # Helper function for temperature analysis
             def analyze_temp_effects(
-                subset_data, domain="All", task="All", ppp="All", level="overall"
+                subset_data, domain="All", label="All", ppp="All", level="overall"
             ):
                 if len(subset_data) < 2:
                     return
@@ -3787,407 +3576,3 @@ class CausalReasoningAnalysis:
             )
 
         return metrics_df
-
-
-#################################
-### Domain Correlation Analysis
-####################################
-class DomainCorrelationAnalysis(CausalReasoningAnalysis):
-    def analyze_domain_correlations_per_temp(self):
-        """Analyze correlations between human and LLM responses by domain"""
-        humans = self.data[self.data["agent"] == "humans"].copy()
-        results = []
-
-        llm_agents = [s for s in self.data["agent"].unique() if s != "humans"]
-        match_columns = ["domain", "ppp", "task"]
-
-        for llm in llm_agents:
-            llm_data = self.data[self.data["agent"] == llm].copy()
-
-            # Analyze by domain
-            for domain in self.data["domain"].unique():
-                domain_humans = humans[humans["domain"] == domain]
-                domain_llm = llm_data[llm_data["domain"] == domain]
-
-                # Match data
-                matched_data = pd.merge(
-                    domain_humans[match_columns + ["response"]],
-                    domain_llm[match_columns + ["response", "temperature"]],
-                    on=match_columns,
-                    suffixes=("_human", "_llm"),
-                )
-
-                # Analyze for each temperature
-                for temp in matched_data["temperature"].unique():
-                    temp_data = matched_data[matched_data["temperature"] == temp]
-
-                    # Check normality
-                    if len(temp_data) >= 3:
-                        _, h_pval = stats.shapiro(temp_data["response_human"])
-                        _, l_pval = stats.shapiro(temp_data["response_llm"])
-                        is_normal = h_pval > 0.05 and l_pval > 0.05
-                    else:
-                        is_normal = False
-
-                    # Calculate correlation
-                    if is_normal:
-                        corr, p = stats.pearsonr(
-                            temp_data["response_human"], temp_data["response_llm"]
-                        )
-                        method = "pearson"
-                    else:
-                        corr, p = stats.spearmanr(
-                            temp_data["response_human"], temp_data["response_llm"]
-                        )
-                        method = "spearman"
-
-                    results.append(
-                        {
-                            "LLM": llm,
-                            "Domain": domain,
-                            "Temperature": temp,
-                            "Correlation": corr,
-                            "P_value": p,
-                            "Method": method,
-                            "N": len(temp_data),
-                        }
-                    )
-
-        return pd.DataFrame(results)
-
-    def analyze_domain_correlations(self):
-        """Analyze correlations between human and LLM responses by domain"""
-        humans = self.data[self.data["agent"] == "humans"].copy()
-        results = []
-        llm_agents = [s for s in self.data["agent"].unique() if s != "humans"]
-        match_columns = ["domain", "ppp", "task"]
-
-        for llm in llm_agents:
-            llm_data = self.data[self.data["agent"] == llm].copy()
-
-            for domain in self.data["domain"].unique():
-                domain_humans = humans[humans["domain"] == domain]
-                domain_llm = llm_data[llm_data["domain"] == domain]
-
-                # Aggregate LLM responses across temperatures
-                domain_llm_agg = (
-                    domain_llm.groupby(match_columns)["response"].mean().reset_index()
-                )
-
-                # Match data
-                matched_data = pd.merge(
-                    domain_humans[match_columns + ["response"]],
-                    domain_llm_agg[match_columns + ["response"]],
-                    on=match_columns,
-                    suffixes=("_human", "_llm"),
-                )
-
-                # Check normality
-                if len(matched_data) >= 3:
-                    _, h_pval = stats.shapiro(matched_data["response_human"])
-                    _, l_pval = stats.shapiro(matched_data["response_llm"])
-                    is_normal = h_pval > 0.05 and l_pval > 0.05
-                else:
-                    is_normal = False
-
-                # Calculate correlation
-                if is_normal:
-                    corr, p = stats.pearsonr(
-                        matched_data["response_human"], matched_data["response_llm"]
-                    )
-                    method = "pearson"
-                else:
-                    corr, p = stats.spearmanr(
-                        matched_data["response_human"], matched_data["response_llm"]
-                    )
-                    method = "spearman"
-
-                results.append(
-                    {
-                        "LLM": llm,
-                        "Domain": domain,
-                        "Correlation": corr,
-                        "P_value": p,
-                        "Method": method,
-                        "N": len(matched_data),
-                    }
-                )
-
-        return pd.DataFrame(results)
-
-    # def plot_domain_correlations(self, correlation_results, figsize=(15, 10)):
-    #     """Create visualizations for domain-based correlation analysis"""
-    #     fig = plt.figure(figsize=figsize)
-    #     gs = plt.GridSpec(2, 2)
-
-    #     # 1. Domain correlations by LLM
-    #     ax1 = fig.add_subplot(gs[0, 0])
-    #     sns.barplot(
-    #         data=correlation_results, x="Domain", y="Correlation", hue="LLM", ax=ax1
-    #     )
-    #     ax1.set_title("Correlations by Domain and LLM")
-    #     ax1.set_ytask("Correlation Coefficient")
-    #     ax1.tick_params(axis="x", rotation=45)
-
-    #     # 2. Significance by domain
-    #     ax2 = fig.add_subplot(gs[0, 1])
-    #     sig_plot = -np.log10(correlation_results["P_value"])
-    #     sns.barplot(data=correlation_results, x="Domain", y=sig_plot, hue="LLM", ax=ax2)
-    #     ax2.set_title("Correlation Significance by Domain (-log10 p-value)")
-    #     ax2.axhline(-np.log10(0.05), color="r", linestyle="--", task="p=0.05")
-    #     ax2.tick_params(axis="x", rotation=45)
-    #     ax2.legend()
-
-    #     # 3. Heatmap of correlations
-    #     ax3 = fig.add_subplot(gs[1, :])
-    #     pivot_table = correlation_results.pivot_table(
-    #         index="LLM", columns="Domain", values="Correlation"
-    #     )
-    #     sns.heatmap(pivot_table, annot=True, cmap="RdYlBu", center=0, ax=ax3)
-    #     ax3.set_title("Correlation Patterns Across Domains")
-
-    #     plt.tight_layout()
-    #     return fig
-    def plot_domain_correlations(
-        self, correlation_results, plot_type="bar", figsize=(15, 10)
-    ):
-        """
-        Create visualizations for domain-based correlation analysis.
-
-        Parameters:
-            correlation_results (DataFrame): The correlation results data.
-            plot_type (str): The type of plot to use, "bar" or "scatter".
-            figsize (tuple): The size of the figure.
-        """
-        fig = plt.figure(figsize=figsize)
-        gs = plt.GridSpec(2, 2)
-
-        # 1. Domain correlations by LLM
-        ax1 = fig.add_subplot(gs[0, 0])
-        if plot_type == "bar":
-            sns.barplot(
-                data=correlation_results, x="Domain", y="Correlation", hue="LLM", ax=ax1
-            )
-        elif plot_type == "scatter":
-            sns.scatterplot(
-                data=correlation_results,
-                x="Domain",
-                y="Correlation",
-                hue="LLM",
-                style="LLM",
-                s=100,
-                ax=ax1,
-            )
-        else:
-            raise ValueError("Invalid plot_type. Use 'bar' or 'scatter'.")
-        ax1.set_title("Correlations by Domain and LLM")
-        ax1.set_ytask("Correlation Coefficient")
-        ax1.tick_params(axis="x", rotation=45)
-
-        # 2. Significance by domain
-        ax2 = fig.add_subplot(gs[0, 1])
-        sig_plot = -np.log10(correlation_results["P_value"])
-        if plot_type == "bar":
-            sns.barplot(
-                data=correlation_results, x="Domain", y=sig_plot, hue="LLM", ax=ax2
-            )
-        elif plot_type == "scatter":
-            sns.scatterplot(
-                data=correlation_results,
-                x="Domain",
-                y=sig_plot,
-                hue="LLM",
-                style="LLM",
-                s=100,
-                ax=ax2,
-            )
-        ax2.set_title("Correlation Significance by Domain (-log10 p-value)")
-        ax2.axhline(-np.log10(0.05), color="r", linestyle="--", task="p=0.05")
-        ax2.tick_params(axis="x", rotation=45)
-        ax2.legend()
-
-        # 3. Heatmap of correlations
-        ax3 = fig.add_subplot(gs[1, :])
-        pivot_table = correlation_results.pivot_table(
-            index="LLM", columns="Domain", values="Correlation"
-        )
-        sns.heatmap(pivot_table, annot=True, cmap="RdYlBu", center=0, ax=ax3)
-        ax3.set_title("Correlation Patterns Across Domains")
-
-        plt.tight_layout()
-        return fig
-
-    #################################
-    # by task
-    ####################################
-    def plot_task_correlations(self, style="bar", figsize=(15, 10)):
-        """Plot correlations for each task with customizable style"""
-        humans = self.data[self.data["agent"] == "humans"].copy()
-        tasks = sorted(self.data["task"].unique())
-
-        for task in tasks:
-            fig = plt.figure(figsize=figsize)
-            gs = plt.GridSpec(3, 2)
-            ax1 = fig.add_subplot(gs[:-1, :])
-            ax2 = fig.add_subplot(gs[-1, :])
-
-            task_results = []
-            sample_sizes = []
-
-            for domain in self.data["domain"].unique():
-                task_humans = humans[
-                    (humans["domain"] == domain) & (humans["task"] == task)
-                ]["response"].values
-
-                for llm in [s for s in self.data["agent"].unique() if s != "humans"]:
-                    llm_data = self.data[
-                        (self.data["agent"] == llm)
-                        & (self.data["domain"] == domain)
-                        & (self.data["task"] == task)
-                    ]
-
-                    for temp in llm_data["temperature"].unique():
-                        temp_data = llm_data[llm_data["temperature"] == temp][
-                            "response"
-                        ].values
-                        if len(task_humans) > 0 and len(temp_data) > 0:
-                            try:
-                                corr, p = stats.spearmanr(task_humans, temp_data)
-                                task_results.append(
-                                    {
-                                        "domain": domain,
-                                        "agent": llm,
-                                        "temperature": temp,
-                                        "correlation": corr,
-                                        "p_value": p,
-                                    }
-                                )
-                                sample_sizes.append(
-                                    {
-                                        "domain": domain,
-                                        "agent": llm,
-                                        "temperature": temp,
-                                        "n_samples": len(task_humans),
-                                    }
-                                )
-                            except:
-                                continue
-
-            df = pd.DataFrame(task_results)
-            df_samples = pd.DataFrame(sample_sizes)
-
-            # Plot correlations
-            if style == "bar":
-                sns.barplot(data=df, x="domain", y="correlation", hue="agent", ax=ax1)
-            else:
-                sns.scatterplot(
-                    data=df,
-                    x="domain",
-                    y="correlation",
-                    hue="agent",
-                    style="agent",
-                    s=100,
-                    ax=ax1,
-                )
-
-            ax1.set_title(f"Correlations by Domain for Task {task}")
-            ax1.set_ytask("Correlation Coefficient")
-            ax1.tick_params(axis="x", rotation=45)
-
-            # Plot significance
-            ax1_twin = ax1.twinx()
-            sig_plot = -np.log10(df["p_value"])
-            if style == "bar":
-                sns.barplot(
-                    data=df,
-                    x="domain",
-                    y=sig_plot,
-                    hue="agent",
-                    ax=ax1_twin,
-                    alpha=0.3,
-                )
-            else:
-                sns.scatterplot(
-                    data=df,
-                    x="domain",
-                    y=sig_plot,
-                    hue="agent",
-                    style="agent",
-                    s=100,
-                    ax=ax1_twin,
-                    alpha=0.3,
-                )
-
-            ax1_twin.set_ytask("-log10(p-value)")
-            ax1_twin.axhline(-np.log10(0.05), color="r", linestyle="--", task="p=0.05")
-
-            # Sample sizes
-            sns.barplot(data=df_samples, x="domain", y="n_samples", hue="agent", ax=ax2)
-            ax2.set_title(f"Sample Size by Domain for Task {task}")
-            ax2.set_ytask("Number of Samples")
-            ax2.tick_params(axis="x", rotation=45)
-
-            plt.tight_layout()
-            yield fig
-            plt.close()
-
-    def plot_all_task_correlations(
-        self, style="bar", filename_prefix="task_correlations_"
-    ):
-        """Generate and save plots for all tasks"""
-        for i, fig in enumerate(self.plot_task_correlations(style=style)):
-            task = sorted(self.data["task"].unique())[i]
-            filename = f"{filename_prefix}{task}.png"
-            fig.savefig(filename, bbox_inches="tight", dpi=300)
-            yield fig
-
-    ###
-    def export_task_domain_correlations(self, filename="task_domain_correlations.xlsx"):
-        """Export task and domain specific correlations to Excel"""
-        humans = self.data[self.data["agent"] == "humans"].copy()
-        llm_agents = [s for s in self.data["agent"].unique() if s != "humans"]
-        results = []
-
-        for domain in self.data["domain"].unique():
-            for task in sorted(self.data["task"].unique()):
-                task_humans = humans[
-                    (humans["domain"] == domain) & (humans["task"] == task)
-                ]["response"].values
-
-                for llm in llm_agents:
-                    llm_data = self.data[
-                        (self.data["agent"] == llm)
-                        & (self.data["domain"] == domain)
-                        & (self.data["task"] == task)
-                    ]
-
-                    for temp in llm_data["temperature"].unique():
-                        temp_data = llm_data[llm_data["temperature"] == temp][
-                            "response"
-                        ].values
-                        if len(task_humans) > 0 and len(temp_data) > 0:
-                            try:
-                                corr, p = stats.spearmanr(task_humans, temp_data)
-
-                                # Add mean responses and std
-                                results.append(
-                                    {
-                                        "Domain": domain,
-                                        "Task": task,
-                                        "LLM": llm,
-                                        "Temperature": temp,
-                                        "Correlation": corr,
-                                        "P_value": p,
-                                        "N": len(task_humans),
-                                        "Human_Mean": task_humans.mean(),
-                                        "Human_Std": task_humans.std(),
-                                        "LLM_Mean": temp_data.mean(),
-                                        "LLM_Std": temp_data.std(),
-                                    }
-                                )
-                            except:
-                                continue
-
-        df = pd.DataFrame(results)
-        df.to_excel(filename, index=False)
-        return df
