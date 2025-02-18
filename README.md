@@ -20,7 +20,7 @@ This package is based on the work presented in the paper:
 - Provides tools for **(Spearman) correlation analysis** to measure alignment between human and LLM judgments.
 - Fits responses to **Causal Bayesian Networks (CBNs)** to evaluate normative reasoning.
 - Supports API calls for multiple LLMs, including **GPT-4o, GPT-3.5, Claude-3-Opus, and Gemini-Pro**.
-     - for the dataset constructed based on experiment 1 (model-only condition) from Rehder&Waldmann, 2017.
+     - for the dataset constructed based on experiment 1 (model-only condition) from [Rehder&Waldmann, 2017](https://link.springer.com/article/10.3758/s13421-016-0662-3).
      - dataset: TODO
 
 
@@ -51,7 +51,7 @@ TODO
 
 ## **Data and Models**
 
-CausalAlign provides support for evaluating LLMs across different causal inference tasks. It is particularly apt for datasets building on experiments in Rehder & Waldmann (2017).
+CausalAlign provides support for evaluating LLMs across different causal inference tasks. It is particularly apt for datasets building on experiments in  [Rehder&Waldmann, 2017](https://link.springer.com/article/10.3758/s13421-016-0662-3).
 
 
 
@@ -60,7 +60,7 @@ It includes built-in support for:
 - **Human data from Rehder & Waldmann (2017), experiment 1, model-only condition**
 - **LLM inference responses (GPT-4o, GPT-3.5, Claude, Gemini)**
 
-## **Some Benchmarking Results**
+## **Some Benchmarking Results:**
 
 
 ### **Paper Summary: "Do Large Language Models Reason Causally Like Us? Even Better?"**
