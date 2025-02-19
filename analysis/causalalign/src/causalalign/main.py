@@ -18,9 +18,10 @@ Usage:
     Run the script to execute the experiment with the configured providers.
 """
 
-from dotenv import load_dotenv
-from causalalign.data.experiment import ExperimentRunner
+# from analysis.causalalign.src.causalalign.experiments.call_apis import ExperimentRunner
+from causalalign.experiments.call_apis import ExperimentRunner
 from causalalign.llm.client import LLMConfig
+from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()

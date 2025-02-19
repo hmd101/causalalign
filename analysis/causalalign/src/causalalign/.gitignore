@@ -1,7 +1,8 @@
 tests/
 probability/
 models/
-llm/
+llm/*
+!llm/
 !llm/*.py
 graph/
 examples/

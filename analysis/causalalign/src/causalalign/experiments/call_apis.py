@@ -73,9 +73,7 @@ class ExperimentRunner:
         current_dir = os.path.dirname(
             os.path.abspath(__file__)
         )  # Gets the experiment.py directory
-        self.input_path = os.path.join(
-            current_dir, "17_rehder_wes_datasets", "prompts_only"
-        )
+        self.input_path = os.path.join(current_dir, "17_rw", "prompts_only")
         self.results_folder = self._setup_results_folder()
 
     def _setup_results_folder(self) -> str:
@@ -91,13 +89,6 @@ class ExperimentRunner:
         if os.path.exists(self.log_file):
             return pd.read_csv(self.log_file, sep=";")
         return pd.DataFrame(columns=["file_name", "init_response"])
-
-    # def _setup_results_folder(self) -> str:
-    #     base_folder = f"17_rehder_wes_datasets/results/{self.version}"
-    #     if self.cot:
-    #         base_folder += "_cot"
-    #     os.makedirs(base_folder, exist_ok=True)
-    #     return base_folder
 
     def process_file(
         self,
