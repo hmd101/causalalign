@@ -21,7 +21,7 @@ This package is based on the work presented in the paper:
 - Fits responses to **Causal Bayesian Networks (CBNs)** to evaluate normative reasoning.
 - Supports API calls for multiple LLMs, including **GPT-4o, GPT-3.5, Claude-3-Opus, and Gemini-Pro**.
      - for the dataset constructed based on experiment 1 (model-only condition) from [Rehder&Waldmann, 2017](https://link.springer.com/article/10.3758/s13421-016-0662-3).
-     - dataset: TODO
+     - dataset: _Coming soon_
 
 
 ## **Installation**
@@ -45,9 +45,20 @@ pip install git+https://github.com/yourusername/causalalign.git
 ## **Usage**
 
 ```bash
-TODO
+_Coming soon_
 ```
 
+
+### **API calls**
+```bash
+_Coming soon_
+```
+
+#### **Required Data Format:**
+
+```bash
+_Coming soon_
+```
 
 ## **Data and Models**
 
