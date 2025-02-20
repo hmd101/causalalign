@@ -29,7 +29,7 @@ This package is based on the work presented in the paper:
 To install the package, clone the repository and install dependencies:
 
 ```bash
-git clone <https://github.com/yourusername/causalalign.git>
+git clone <https://github.com/hmd101/causalalign.git>
 cd causalalign
 pip install -e .
 
@@ -38,7 +38,7 @@ pip install -e .
 If you want to install directly from a public GitHub repository:
 
 ```bash
-pip install git+https://github.com/yourusername/causalalign.git
+pip install git+https://github.com/hmd101/causalalign.git
 
 ```
 
