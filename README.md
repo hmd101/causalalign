@@ -128,7 +128,7 @@ Table: Spearman correlations (**rₛ**) between **human** and **LLM** inferences
 
 Please cite paper as:
 
-```
+```bibtex
 @misc{dettki2025largelanguagemodelsreason,
   title         = {Do Large Language Models Reason Causally Like Us? Even Better?},
   author        = {Hanna M. Dettki and Brenden M. Lake and Charley M. Wu and Bob Rehder},
