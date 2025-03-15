@@ -22,13 +22,14 @@ def expand_domain_to_dataframe(domain_dict):
 
     # Prepare data storage
     data = []
-    var_keys = []
+    var_keys = []  # Stores variable keys (C1, C2, E)
+    var_names = []  # Stores actual variable names (e.g., "interest rates")
     var_p_values = []
     var_m_values = []
 
     # Extract variable details and prepare p/m values separately
     for var, details in variables.items():
-        var_name = details[f"{var.lower()}_name"]
+        var_name = details[f"{var.lower()}_name"]  # Fetch actual variable name
         var_detailed = details[f"{var.lower()}_detailed"]
 
         p_values = [("p", key, val) for key, val in details["p_value"].items()]
@@ -39,6 +40,7 @@ def expand_domain_to_dataframe(domain_dict):
         )
 
         var_keys.append(var)
+        var_names.append(var_name)  # Store the actual variable name
         var_p_values.append(p_values)
         var_m_values.append(m_values)
 
@@ -49,15 +51,15 @@ def expand_domain_to_dataframe(domain_dict):
         row = {"domain": domain_name}
         cntbl_cond = ""  # Counterbalance condition initialization
 
-        for var, cntbl, p_vals, m_vals in zip(
-            var_keys, cntbl_combo, var_p_values, var_m_values
+        for var, var_name, cntbl, p_vals, m_vals in zip(
+            var_keys, var_names, cntbl_combo, var_p_values, var_m_values
         ):
             chosen_values = p_vals if cntbl == "p" else m_vals
             var_cntbl, var_value, var_sense = chosen_values[
                 0
-            ]  # Always picking first key-value pair
+            ]  # Select the first key-value pair
 
-            row[f"{var}"] = var_keys[var_keys.index(var)]
+            row[f"{var}"] = var_name  # Assign actual variable name
             row[f"{var}_values"] = var_value
             row[f"{var}_cntbl"] = var_cntbl
             row[f"{var}_sense"] = var_sense
