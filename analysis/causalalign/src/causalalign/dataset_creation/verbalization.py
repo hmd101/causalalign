@@ -50,7 +50,11 @@ def verbalize_causal_mechanism(domain_dict, df, graph_type, graph_structures):
         return ""
 
 
-def verbalize_inference_task(row):
+def verbalize_inference_task(
+    row,
+    nested_dict,
+    prompt_type="Please provide only a numeric response and no additional information",
+):
     """
     Generate the verbalized inference task based on a DataFrame row.
 
@@ -58,33 +62,69 @@ def verbalize_inference_task(row):
     -----------
     row : pd.Series
         A row from the DataFrame containing the inference task information.
+    nested_dict : dict
+        The nested dictionary containing value mappings for variables created by `create_domain_dict`.
+    prompt_type : str
+        The type of prompt to be displayed to the LLM. Default is single numeric response.
+        But it can be changed to a different prompt type, e.g. CoT.
 
     Returns:
     --------
     str
         The verbalized inference task statement.
     """
+    # Extract the domain variables dictionary
+    variables_dict = nested_dict["domain"]["variables"]
+
     # Split the observations into a list
     observations = row["observation"].split(", ")
 
     # Construct the observation text
-    observation_text = (
-        " Now suppose you observe the following: "
-        + ", ".join(
-            [
-                f"{row[obs.split('=')[0] + '_sense']} {row[obs.split('=')[0]]}"
-                for obs in observations
-            ]
-        )
-        + "."
-    )
+    observation_text = " Now suppose you observe the following: "
+    observation_descriptions = []
+
+    for obs in observations:
+        var_name, value = obs.split(
+            "="
+        )  # Extract variable (e.g., C2) and value (e.g., 0)
+        cntbl_type = row[f"{var_name}_cntbl"]  # Get counterbalancing type ('p' or 'm')
+
+        # Lookup the correct dictionary entry for this variable
+        if var_name not in variables_dict:
+            raise KeyError(
+                f"Variable {var_name} not found in nested_dict['domain']['variables']"
+            )
+
+        value_mapping = variables_dict[
+            var_name
+        ]  # Get dictionary entry for C1, C2, or E
+
+        # Determine the correct sense label based on counterbalancing type (p or m)
+        if f"{cntbl_type}_value" in value_mapping:
+            sense_label = value_mapping[f"{cntbl_type}_value"].get(value)
+        else:
+            # If only one exists, default to the available one
+            available_mapping = value_mapping.get(
+                "p_value", value_mapping.get("m_value")
+            )
+            sense_label = available_mapping.get(value)
+
+        if sense_label is None:
+            raise KeyError(
+                f"Value {value} for {var_name} is missing in nested_dict['domain']['variables'][{var_name}]"
+            )
+
+        # Append the formatted observation
+        observation_descriptions.append(f"{sense_label} {row[var_name]}")
+
+    observation_text += ", ".join(observation_descriptions) + "."
 
     # Extract the query variable and its sense
     query_var = row["query_node"].split("=")[0]
     query_sense = row[f"{query_var}_sense"]
 
     # Construct the query text
-    query_text = f" Given the observations and the causal mechanism, how likely on a scale from 0 to 100 is {query_sense} {row[query_var]}? 0 means definitely not likely and 100 means definitely likely. Please provide only a numeric response and no additional information."
+    query_text = f" Given the observations and the causal mechanism, how likely on a scale from 0 to 100 is {query_sense} {row[query_var]}? 0 means definitely not likely and 100 means definitely likely. {prompt_type}."
 
     # Combine observation text and query text
     return observation_text + query_text

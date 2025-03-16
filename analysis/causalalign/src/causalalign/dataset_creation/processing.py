@@ -29,8 +29,8 @@ def expand_domain_to_dataframe(domain_dict):
 
     # Extract variable details and prepare p/m values separately
     for var, details in variables.items():
-        var_name = details[f"{var.lower()}_name"]  # Fetch actual variable name
-        var_detailed = details[f"{var.lower()}_detailed"]
+        var_name = details[f"{var.upper()}_name"]  # Fetch actual variable name
+        var_detailed = details[f"{var.upper()}_detailed"]
 
         p_values = [("p", key, val) for key, val in details["p_value"].items()]
         m_values = (
@@ -63,7 +63,7 @@ def expand_domain_to_dataframe(domain_dict):
             row[f"{var}_values"] = var_value
             row[f"{var}_cntbl"] = var_cntbl
             row[f"{var}_sense"] = var_sense
-            row[f"{var}_detailed"] = variables[var][f"{var.lower()}_detailed"]
+            row[f"{var}_detailed"] = variables[var][f"{var.upper()}_detailed"]
 
             cntbl_cond += var_cntbl  # Concatenate all counterbalance conditions
 
