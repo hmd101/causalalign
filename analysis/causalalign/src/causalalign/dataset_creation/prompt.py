@@ -10,7 +10,13 @@ from causalalign.dataset_creation.verbalization import (
 
 
 def generate_prompt_dataframe(
-    domain_dict, inference_tasks, graph_type, graph_structures
+    domain_dict,
+    inference_tasks,
+    graph_type,
+    graph_structures,
+    prompt_type="Please provide only a numeric response and no additional information",
+    prompt_category="single_numeric_response",
+    counterbalance_enabled=True,
 ):
     """
     Expand the DataFrame to include full prompt verbalization and graph structure.
@@ -58,10 +64,14 @@ def generate_prompt_dataframe(
 
     # Generate the full prompt by combining domain introduction, causal mechanism, and inference task
     df["prompt"] = df.apply(
-        lambda row: domain_intro + causal_mechanism + verbalize_inference_task(row),
+        lambda row: domain_intro
+        + causal_mechanism
+        + verbalize_inference_task(
+            row, nested_dict=domain_dict, prompt_type=prompt_type
+        ),
         axis=1,
     )
-
+    df["prompt_category"] = prompt_category
     return df
 
 

@@ -50,11 +50,7 @@ def verbalize_causal_mechanism(domain_dict, df, graph_type, graph_structures):
         return ""
 
 
-def verbalize_inference_task(
-    row,
-    nested_dict,
-    prompt_type="Please provide only a numeric response and no additional information",
-):
+def verbalize_inference_task(row, nested_dict, prompt_type):
     """
     Generate the verbalized inference task based on a DataFrame row.
 

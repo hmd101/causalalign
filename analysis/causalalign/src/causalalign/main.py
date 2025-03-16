@@ -64,9 +64,13 @@ if __name__ == "__main__":
         )
 
     runner = ExperimentRunner(
-        provider_configs=provider_configs, version="1_v", cot=False, n_times=5
+        provider_configs=provider_configs, version="2_v", cot=False, n_times=4
     )
 
     runner.run(
-        sub_folder_xs=["vanilla"], temperature_value_xs=[0.5, 0.7, 0.3]
+        # sub_folder_xs=["vanilla"], temperature_value_xs=[0.5, 0.7, 0.3, 0.0, 1.0]
+        input_path="datasets/17_rw",
+        output_path="../../results/17_rw",
+        sub_folder_xs=["prompts_for_LLM_api"],
+        temperature_value_xs=[0.0, 0.3, 0.5, 0.7, 1.0],
     )  # other temperature values ran: 0.5, 0.7, 0.3 -> for gpt40 and gemini-pro
