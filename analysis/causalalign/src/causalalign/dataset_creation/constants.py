@@ -127,7 +127,7 @@ graph_structures = {
     },
     "chain": {
         "description": "C1→C2→E",
-        "causal_template": "{c1_sense} {c1_name} causes {c2_sense} {c2_name}. Also, {c2_sense} {c2_name} causes {e_sense} {e_name}.",
+        "causal_template": "{c1_sense} {c1_name} causes {c2_sense} {c2_name}. And {c2_sense} {c2_name} causes {e_sense} {e_name}.",
     },
 }
 

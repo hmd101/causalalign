@@ -41,13 +41,15 @@ if __name__ == "__main__":
             # provider="openai", api_key=openai_key, model_name="gpt-4o"
             provider="openai",
             api_key=openai_key,
-            model_name="gpt-3.5-turbo",
+            model_name="gpt-4o",  # "gpt-4.5" "gpt-3.5-turbo",
         )
 
     # Add Gemini if key exists
     if google_key:
         provider_configs["gemini"] = LLMConfig(
-            provider="gemini", api_key=google_key, model_name="gemini-pro"
+            provider="gemini",
+            api_key=google_key,
+            model_name="gemini-2.0-pro-exp-02-05",  # "gemini-1.5-pro", "gemini-pro"
         )
 
     # Add Claude if key exists
@@ -55,7 +57,7 @@ if __name__ == "__main__":
         provider_configs["claude"] = LLMConfig(
             provider="claude",
             api_key=anthropic_key,
-            model_name="claude-3-opus-20240229",
+            model_name="claude-3-opus-20240229",  # "claude-3-7-sonnet-20250219","claude-3-5-sonnet-20240620", "claude-3-5-haiku-20241022"
         )
 
     if not provider_configs:
