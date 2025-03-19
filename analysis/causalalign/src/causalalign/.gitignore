@@ -1,6 +1,7 @@
 tests/
 probability/
 models/
+datasets/17_rw/*
 llm/*
 !llm/
 !llm/*.py
