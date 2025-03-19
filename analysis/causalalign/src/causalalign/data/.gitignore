@@ -3,3 +3,4 @@ data_loader.py
 test_api.ipynb
 dataset_generation/
 !dataset_generation/cartoon_pngs
+*.csv
