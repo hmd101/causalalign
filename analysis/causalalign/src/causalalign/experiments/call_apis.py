@@ -44,26 +44,51 @@ Methods:
 import time
 import uuid
 from datetime import datetime
-from typing import Dict
+from typing import Dict, List
 
 import pandas as pd
 
-from ..llm.client import BaseLLMClient, LLMConfig, create_llm_client
-
+from ..llm.client import BaseLLMClient, LLMConfig, create_llm_clients
 
 # In causalalign/src/causalalign/data/experiment.py
+# class ExperimentRunner:
+#     def __init__(
+#         self,
+#         provider_configs: Dict[str, LLMConfig],
+#         version: str = "2_v",
+#         cot: bool = False,
+#         combine_cnt_cond: bool = False,
+#         n_times: int = 4,
+#         input_path: str = None,  # Allow passing input path
+#         output_path: str = None,  # Allow passing output path
+#     ):
+#         self.provider_configs = provider_configs
+#         self.version = version
+#         self.cot = cot
+#         self.n_times = n_times
+#         self.combine_cnt_cond = combine_cnt_cond
+#         self.run_id = str(uuid.uuid4())
+#         self.version_flag = "1_experiment"
+#         self.log_file = "init_responses_log.csv"
+#         self.init_log = self._load_or_create_log()
+
+
 class ExperimentRunner:
     def __init__(
         self,
-        provider_configs: Dict[str, LLMConfig],
+        provider_configs: Dict[
+            str, List[LLMConfig]
+        ],  # Change from single LLMConfig to a list of LLMConfig
         version: str = "2_v",
         cot: bool = False,
         combine_cnt_cond: bool = False,
         n_times: int = 4,
-        input_path: str = None,  # Allow passing input path
-        output_path: str = None,  # Allow passing output path
+        input_path: str = None,
+        output_path: str = None,
     ):
-        self.provider_configs = provider_configs
+        self.provider_configs = (
+            provider_configs  # Now stores multiple models per provider
+        )
         self.version = version
         self.cot = cot
         self.n_times = n_times
@@ -73,17 +98,29 @@ class ExperimentRunner:
         self.log_file = "init_responses_log.csv"
         self.init_log = self._load_or_create_log()
 
-        # Use provided input_path, otherwise default to "17_rw/prompts_only"
-        if input_path:
-            self.input_path = input_path
-        else:
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            self.input_path = os.path.join(current_dir, "17_rw", "prompts_only")
-
-        # Use provided output_path, otherwise default to "results/{version}"
+        # Set paths
+        self.input_path = (
+            input_path
+            if input_path
+            else os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "17_rw", "prompts_only"
+            )
+        )
         self.results_folder = (
             output_path if output_path else self._setup_results_folder()
         )
+
+        # # Use provided input_path, otherwise default to "17_rw/prompts_only"
+        # if input_path:
+        #     self.input_path = input_path
+        # else:
+        #     current_dir = os.path.dirname(os.path.abspath(__file__))
+        #     self.input_path = os.path.join(current_dir, "17_rw", "prompts_only")
+
+        # # Use provided output_path, otherwise default to "results/{version}"
+        # self.results_folder = (
+        #     output_path if output_path else self._setup_results_folder()
+        # )
 
     def _setup_results_folder(self) -> str:
         base_folder = os.path.join(
@@ -173,7 +210,7 @@ class ExperimentRunner:
                     {
                         "id": row["id"],
                         "response": response.content,
-                        "prompt": row["prompt"],  # Include prompt
+                        # "prompt": row["prompt"],  # Include prompt
                         "prompt_category": row["prompt_category"],  # New
                         "graph": row["graph"],  # New
                         "domain": row["domain"],
@@ -270,6 +307,54 @@ class ExperimentRunner:
         response_df.to_csv(file_path, index=False, sep=";")
         print(f"Responses saved to {file_path}")
 
+    # def run(
+    #     self,
+    #     input_path: str = None,
+    #     output_path: str = None,
+    #     sub_folder_xs: list = None,
+    #     temperature_value_xs: list = None,
+    # ):
+    #     """
+    #     Runs the experiment, processing input files and generating results.
+
+    #     Parameters:
+    #     -----------
+    #     input_path: str
+    #         Path to the folder containing input CSV files. If None, uses the default.
+    #     output_path: str
+    #         Path to store results. If None, uses the default results folder.
+    #     sub_folder_xs: list
+    #         List of subfolders to process.
+    #     temperature_value_xs: list
+    #         List of temperature values for LLM generation.
+    #     """
+    #     # Override paths if specified
+    #     if input_path:
+    #         self.input_path = input_path
+    #     if output_path:
+    #         self.results_folder = output_path
+
+    #     if sub_folder_xs is None or temperature_value_xs is None:
+    #         raise ValueError("sub_folder_xs and temperature_value_xs must be provided.")
+
+    #     for subfolder in sub_folder_xs:
+    #         subfolder_path = os.path.join(self.input_path, subfolder)
+    #         if not os.path.exists(subfolder_path):
+    #             print(
+    #                 f"Warning: Subfolder {subfolder_path} does not exist. Skipping..."
+    #             )
+    #             continue
+
+    #         input_files = [f for f in os.listdir(subfolder_path) if f.endswith(".csv")]
+
+    #         for input_file in input_files:
+    #             for temperature_value in temperature_value_xs:
+    #                 for provider, config in self.provider_configs.items():
+    #                     llm_client = create_llm_client(config)
+    #                     self.process_file(
+    #                         input_file, subfolder, llm_client, temperature_value
+    #                     )
+
     def run(
         self,
         input_path: str = None,
@@ -278,7 +363,7 @@ class ExperimentRunner:
         temperature_value_xs: list = None,
     ):
         """
-        Runs the experiment, processing input files and generating results.
+        Runs the experiment, processing input files and generating results for multiple models per provider.
 
         Parameters:
         -----------
@@ -312,8 +397,17 @@ class ExperimentRunner:
 
             for input_file in input_files:
                 for temperature_value in temperature_value_xs:
-                    for provider, config in self.provider_configs.items():
-                        llm_client = create_llm_client(config)
-                        self.process_file(
-                            input_file, subfolder, llm_client, temperature_value
-                        )
+                    for (
+                        provider,
+                        config_list,
+                    ) in self.provider_configs.items():  # Iterate over multiple models
+                        for config in (
+                            config_list
+                        ):  # Now config_list is a list of LLMConfig objects
+                            llm_clients = create_llm_clients(
+                                config, [config.model_name]
+                            )
+                            for llm_client in llm_clients:
+                                self.process_file(
+                                    input_file, subfolder, llm_client, temperature_value
+                                )

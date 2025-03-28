@@ -1,0 +1,12 @@
+id;response;prompt_category;graph;domain;task;cntbl_cond;subject;temperature
+1;<response><likelihood>50</likelihood><confidence>80</confidence></response>;numeric-certainty;collider;abc;a;ppp;gpt-4o;0.0
+2;<response><likelihood>50</likelihood><confidence>70</confidence></response>;numeric-certainty;collider;abc;a;ppp;gpt-4o;0.0
+3;<response><likelihood>50</likelihood><confidence>50</confidence></response>;numeric-certainty;collider;abc;b;ppp;gpt-4o;0.0
+4;<response><likelihood>50</likelihood><confidence>70</confidence></response>;numeric-certainty;collider;abc;b;ppp;gpt-4o;0.0
+5;<response><likelihood>50</likelihood><confidence>70</confidence></response>;numeric-certainty;collider;abc;c;ppp;gpt-4o;0.0
+6;<response><likelihood>90</likelihood><confidence>95</confidence></response>;numeric-certainty;collider;abc;c;ppp;gpt-4o;0.0
+7;<response><likelihood>50</likelihood><confidence>70</confidence></response>;numeric-certainty;collider;abc;d;ppp;gpt-4o;0.0
+8;<response><likelihood>50</likelihood><confidence>70</confidence></response>;numeric-certainty;collider;abc;d;ppp;gpt-4o;0.0
+9;<response><likelihood>50</likelihood><confidence>70</confidence></response>;numeric-certainty;collider;abc;e;ppp;gpt-4o;0.0
+10;<response><likelihood>70</likelihood><confidence>80</confidence></response>;numeric-certainty;collider;abc;e;ppp;gpt-4o;0.0
+11;<response><likelihood>0</likelihood><confidence>90</confidence></response>;numeric-certainty;collider;abc;f;ppp;gpt-4o;0.0

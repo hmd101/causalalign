@@ -103,21 +103,40 @@ class ClaudeClient(BaseLLMClient):
             raise Exception(f"Claude API error: {str(e)}")
 
 
+# class LLMClientFactory:
+#     """Factory class to create appropriate LLM client based on provider"""
+
+#     @staticmethod
+#     def create_client(
+#         provider: str, api_key: str, model_name: Optional[str] = None
+#     ) -> BaseLLMClient:
+#         if provider.lower() == "openai":
+#             return OpenAIClient(api_key, model_name or "gpt-3.5-turbo")
+#         elif provider.lower() == "gemini":
+#             return GeminiClient(api_key, model_name or "gemini-pro")
+#         elif provider.lower() == "claude":
+#             return ClaudeClient(api_key, model_name or "claude-3-opus-20240229")
+#         else:
+#             raise ValueError(f"Unsupported LLM provider: {provider}")
+
+
 class LLMClientFactory:
-    """Factory class to create appropriate LLM client based on provider"""
+    """Factory class to create appropriate LLM clients for multiple models per provider"""
 
     @staticmethod
-    def create_client(
-        provider: str, api_key: str, model_name: Optional[str] = None
-    ) -> BaseLLMClient:
-        if provider.lower() == "openai":
-            return OpenAIClient(api_key, model_name or "gpt-3.5-turbo")
-        elif provider.lower() == "gemini":
-            return GeminiClient(api_key, model_name or "gemini-pro")
-        elif provider.lower() == "claude":
-            return ClaudeClient(api_key, model_name or "claude-3-opus-20240229")
-        else:
-            raise ValueError(f"Unsupported LLM provider: {provider}")
+    def create_clients(provider: str, api_key: str, model_names: list) -> list:
+        """Creates multiple LLM client instances for a given provider"""
+        clients = []
+        for model_name in model_names:
+            if provider.lower() == "openai":
+                clients.append(OpenAIClient(api_key, model_name))
+            elif provider.lower() == "gemini":
+                clients.append(GeminiClient(api_key, model_name))
+            elif provider.lower() == "claude":
+                clients.append(ClaudeClient(api_key, model_name))
+            else:
+                raise ValueError(f"Unsupported LLM provider: {provider}")
+        return clients  # Return a list of clients
 
 
 # Example configuration class
@@ -128,8 +147,13 @@ class LLMConfig:
         self.model_name = model_name
 
 
-# Usage example for your script
-def create_llm_client(config: LLMConfig) -> BaseLLMClient:
-    return LLMClientFactory.create_client(
-        provider=config.provider, api_key=config.api_key, model_name=config.model_name
-    )
+# def create_llm_client(config: LLMConfig) -> BaseLLMClient:
+#     return LLMClientFactory.create_client(
+#         provider=config.provider, api_key=config.api_key, model_name=config.model_name
+#     )
+
+
+# supports multiple models per provider
+def create_llm_clients(config: LLMConfig, model_names: list) -> list:
+    """Creates multiple LLM clients for a given provider and its list of models"""
+    return LLMClientFactory.create_clients(config.provider, config.api_key, model_names)

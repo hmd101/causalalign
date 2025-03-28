@@ -6,10 +6,10 @@ rw_17_domain_components = {
         "domain_name": "economy",
         "variables": {
             "C1": {
-                "name": "interest rates",
-                "detailed": "Interest rates are the rates banks charge to loan money.",
-                "p_value": {"1": "low", "0": "high"},
-                "m_value": {"1": "high", "0": "low"},
+                "C1_name": "interest rates",
+                "C1_detailed": "Interest rates are the rates banks charge to loan money.",
+                "p_value": {"1": "low", "0": "normal"},
+                "m_value": {"1": "high", "0": "normal"},
                 "explanations": {
                     "p_p": "Low interest rates stimulate economic growth, leading to greater prosperity overall, and allowing more money to be saved for retirement in particular.",
                     "p_m": "The good economic times produced by the low interest rates leads to greater confidence and less worry about the future, so people are less concerned about retirement.",
@@ -18,10 +18,10 @@ rw_17_domain_components = {
                 },
             },
             "C2": {
-                "name": "trade deficits",
-                "detailed": "A country's trade deficit is the difference between the value of the goods that a country imports and the value of the goods that a country exports.",
-                "p_value": {"1": "small", "0": "large"},
-                "m_value": {"1": "large", "0": "small"},
+                "C2_name": "trade deficits",
+                "C2_detailed": "A country's trade deficit is the difference between the value of the goods that a country imports and the value of the goods that a country exports.",
+                "p_value": {"1": "small", "0": "normal"},
+                "m_value": {"1": "large", "0": "normal"},
                 "explanations": {
                     "p_p": "When the economy is good, people can cover their basic expenses and so have enough money left over to contribute to their retirement accounts.",
                     "p_m": "When the economy is good, people are optimistic and so spend rather than save.",
@@ -30,22 +30,22 @@ rw_17_domain_components = {
                 },
             },
             "E": {
-                "name": "retirement savings",
-                "detailed": "Retirement savings is the money people save for their retirement.",
-                "p_value": {"1": "high", "0": "low"},
-                "m_value": {"1": "low", "0": "high"},
+                "E_name": "retirement savings",
+                "E_detailed": "Retirement savings is the money people save for their retirement.",
+                "p_value": {"1": "high", "0": "normal"},
+                "m_value": {"1": "low", "0": "normal"},
             },
         },
         "introduction": "Economists seek to describe and predict the regular patterns of economic fluctuation. To do this, they study some important variables or attributes of economies. They also study how these attributes are responsible for producing or causing one another.",
     },
     "sociology": {
-        "name": "sociology",
+        "domain_name": "sociology",
         "variables": {
             "C1": {
-                "name": "urbanization",
-                "detailed": "Urbanization is the degree to which the members of a society live in urban environments (i.e., cities) versus rural environments.",
-                "p_value": {"1": "high", "0": "low"},
-                "m_value": {"1": "low", "0": "high"},
+                "C1_name": "urbanization",
+                "C1_detailed": "Urbanization is the degree to which the members of a society live in urban environments (i.e., cities) versus rural environments.",
+                "p_value": {"1": "high", "0": "normal"},
+                "m_value": {"1": "low", "0": "normal"},
                 "explanations": {
                     "p_p": "Big cities provide many opportunities for financial and social improvement.",
                     "p_m": "In big cities many people are competing for the same high-status jobs and occupations.",
@@ -54,10 +54,10 @@ rw_17_domain_components = {
                 },
             },
             "C2": {
-                "name": "interest in religion",
-                "detailed": "Interest in religion is the degree to which the members of a society show a curiosity in religion issues or participate in organized religions.",
-                "p_value": {"1": "low", "0": "high"},
-                "m_value": {"1": "high", "0": "low"},
+                "C2_name": "interest in religion",
+                "C2_detailed": "Interest in religion is the degree to which the members of a society show a curiosity in religion issues or participate in organized religions.",
+                "p_value": {"1": "low", "0": "normal"},
+                "m_value": {"1": "high", "0": "normal"},
                 "explanations": {
                     "p_p": "Without the restraint of religion-based morality, the impulse toward greed dominates and people tend to accumulate material wealth.",
                     "p_m": "Many religions reinforce a strong work ethic; without this motivation, workers become complacent at their jobs.",
@@ -66,22 +66,22 @@ rw_17_domain_components = {
                 },
             },
             "E": {
-                "name": "socio-economic mobility",
-                "detailed": "Socioeconomic mobility is the degree to which the members of a society are able to improve their social and economic status.",
-                "p_value": {"1": "high", "0": "low"},
-                "m_value": {"1": "low", "0": "high"},
+                "E_name": "socio-economic mobility",
+                "E_detailed": "Socioeconomic mobility is the degree to which the members of a society are able to improve their social and economic status.",
+                "p_value": {"1": "high", "0": "normal"},
+                "m_value": {"1": "low", "0": "normal"},
             },
         },
         "introduction": "Sociologists seek to describe and predict the regular patterns of societal interactions. To do this, they study some important variables or attributes of societies. They also study how these attributes are responsible for producing or causing one another.",
     },
     "weather": {
-        "name": "weather",
+        "domain_name": "weather",
         "variables": {
             "C1": {
-                "name": "ozone levels",
-                "detailed": "Ozone is a gaseous allotrope of oxygen (O3) and is formed by exposure to UV radiation.",
-                "p_value": {"1": "high", "0": "low"},
-                "m_value": {"1": "low", "0": "high"},
+                "C1_name": "ozone levels",
+                "C1_detailed": "Ozone is a gaseous allotrope of oxygen (O3) and is formed by exposure to UV radiation.",
+                "p_value": {"1": "low", "0": "normal"},
+                "m_value": {"1": "high", "0": "normal"},
                 # Note: this is graph dependent. the explanations below are based on the collider graph
                 "explanations": {
                     "p_p": "Ozone attracts extra oxygen atoms from water molecules, creating a concentration of water vapor in that region.",
@@ -91,10 +91,10 @@ rw_17_domain_components = {
                 },
             },
             "C2": {
-                "name": "air pressure",
-                "detailed": "Air pressure is force exerted due to concentrations of air molecules.",
-                "p_value": {"1": "low", "0": "high"},
-                "m_value": {"1": "high", "0": "low"},
+                "C2_name": "air pressure",
+                "C2_detailed": "Air pressure is force exerted due to concentrations of air molecules.",
+                "p_value": {"1": "high", "0": "normal"},
+                "m_value": {"1": "low", "0": "normal"},
                 # Note: this is graph dependent. the explanations below are based on the collider graph
                 "explanations": {
                     "p_p": "When pressure does not force water vapor to break into oxygen and hydrogen atoms, water vapor remains in abundance.",
@@ -104,10 +104,10 @@ rw_17_domain_components = {
                 },
             },
             "E": {
-                "name": "humidity",
-                "detailed": "Humidity is the degree to which the atmosphere contains water molecules.",
-                "p_value": {"1": "high", "0": "low"},
-                "m_value": {"1": "low", "0": "high"},
+                "E_name": "humidity",
+                "E_detailed": "Humidity is the degree to which the atmosphere contains water molecules.",
+                "p_value": {"1": "high", "0": "normal"},
+                "m_value": {"1": "low", "0": "normal"},
             },
         },
         "introduction": "Meteorologists seek to describe and predict the regular patterns that govern weather systems. To do this, they study some important variables or attributes of weather systems. They also study how these attributes are responsible for producing or causing one another.",
@@ -118,15 +118,15 @@ rw_17_domain_components = {
 #  graph structures (currently only collider in dataset, but expandable), RW17 used collider and fork.
 graph_structures = {
     "collider": {
-        "description": "C1→E←C2",
-        "causal_template": "{c1_sense} {c1_name} cause {e_sense} {e_name}. Also, {c2_sense} {c2_name} cause {e_sense} {e_name}.",
+        "description": "C1→E←C2",  # RW17: A→C←B
+        "causal_template": "{c1_sense} {c1_name} causes {e_sense} {e_name}. Also, {c2_sense} {c2_name} causes {e_sense} {e_name}.",
     },
     "fork": {
-        "description": "C1←E→C2",
-        "causal_template": "{e_sense} {e_name} causes {c1_sense} {c1_name}. Also, {e_sense} {e_name} causes {c2_sense} {c2_name}.",
+        "description": "C2←C1→E",  # RW17: C←A→B
+        "causal_template": "{c1_sense} {c1_name} causes {c2_sense} {c2_name}. Also, {c1_sense} {c1_name} causes {e_sense} {e_name}.",
     },
     "chain": {
-        "description": "C1→C2→E",
+        "description": "C1→C2→E",  # RW17: A→B→C
         "causal_template": "{c1_sense} {c1_name} causes {c2_sense} {c2_name}. And {c2_sense} {c2_name} causes {e_sense} {e_name}.",
     },
 }

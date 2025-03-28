@@ -50,9 +50,9 @@ def generate_prompt_dataframe(
     domain_intro = verbalize_domain_intro(domain_dict)
 
     # Construct the causal mechanism statement
-    causal_mechanism = verbalize_causal_mechanism(
-        domain_dict, df, graph_type, graph_structures
-    )
+    # causal_mechanism = verbalize_causal_mechanism(
+    #     domain_dict, df, graph_type, graph_structures
+    # )
     # extract graph description in node and edge notation
     # graph_description = graph_structures[graph_type]["description"] if graph_type in graph_structures else ""
 
@@ -63,14 +63,24 @@ def generate_prompt_dataframe(
     df["graph"] = graph_description
 
     # Generate the full prompt by combining domain introduction, causal mechanism, and inference task
+    # df["prompt"] = df.apply(
+    #     lambda row: domain_intro
+    #     + causal_mechanism
+    #     + verbalize_inference_task(
+    #         row, nested_dict=domain_dict, prompt_type=prompt_type
+    #     ),
+    #     axis=1,
+    # )
+
     df["prompt"] = df.apply(
         lambda row: domain_intro
-        + causal_mechanism
+        + verbalize_causal_mechanism(domain_dict, row, graph_type, graph_structures)
         + verbalize_inference_task(
             row, nested_dict=domain_dict, prompt_type=prompt_type
         ),
         axis=1,
     )
+
     df["prompt_category"] = prompt_category
     return df
 

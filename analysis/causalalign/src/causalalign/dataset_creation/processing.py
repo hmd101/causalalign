@@ -2,6 +2,80 @@ import itertools
 
 import pandas as pd
 
+# def expand_domain_to_dataframe(domain_dict):
+#     """
+#     Expand a domain dictionary into a DataFrame with 8 unique counterbalance condition combinations.
+
+#     Parameters:
+#     -----------
+#     domain_dict : dict
+#         A dictionary created using create_domain_dict() function.
+
+#     Returns:
+#     --------
+#     pd.DataFrame
+#         DataFrame where each row represents a unique combination of variable values.
+#     """
+#     # domain_name = domain_dict["domain"]["domain_name"]
+#     # variables = domain_dict["domain"]["variables"]
+#     domain_name = domain_dict["domain_name"]
+#     variables = domain_dict["variables"]
+
+#     # Prepare data storage
+#     data = []
+#     var_keys = []  # Stores variable keys (C1, C2, E)
+#     var_names = []  # Stores actual variable names (e.g., "interest rates")
+#     var_p_values = []
+#     var_m_values = []
+
+#     # Extract variable details and prepare p/m values separately
+#     for var, details in variables.items():
+#         var_name = details[f"{var.upper()}_name"]  # Fetch actual variable name
+#         var_detailed = details[f"{var.upper()}_detailed"]
+
+#         p_values = [("p", key, val) for key, val in details["p_value"].items()]
+#         m_values = (
+#             [("m", key, val) for key, val in details["m_value"].items()]
+#             if "m_value" in details
+#             else p_values  # Default to p_values if m_values are absent
+#         )
+
+#         var_keys.append(var)
+#         var_names.append(var_name)  # Store the actual variable name
+#         var_p_values.append(p_values)
+#         var_m_values.append(m_values)
+
+#     # Construct only the 2^3 = 8 unique counterbalance combinations
+#     cntbl_conditions = list(itertools.product(["p", "m"], repeat=3))
+
+#     for cntbl_combo in cntbl_conditions:
+#         row = {"domain": domain_name}
+#         cntbl_cond = ""  # Counterbalance condition initialization
+
+#         for var, var_name, cntbl, p_vals, m_vals in zip(
+#             var_keys, var_names, cntbl_combo, var_p_values, var_m_values
+#         ):
+#             chosen_values = p_vals if cntbl == "p" else m_vals
+#             var_cntbl, var_value, var_sense = chosen_values[
+#                 0
+#             ]  # Select the first key-value pair
+
+#             row[f"{var}"] = var_name  # Assign actual variable name
+#             row[f"{var}_values"] = var_value
+#             row[f"{var}_cntbl"] = var_cntbl
+#             row[f"{var}_sense"] = var_sense
+#             row[f"{var}_detailed"] = variables[var][f"{var.upper()}_detailed"]
+
+#             cntbl_cond += var_cntbl  # Concatenate all counterbalance conditions
+
+#         row["cntbl_cond"] = cntbl_cond
+#         data.append(row)
+
+#     # Create DataFrame
+#     df = pd.DataFrame(data)
+
+#     return df
+
 
 def expand_domain_to_dataframe(domain_dict):
     """
@@ -17,8 +91,8 @@ def expand_domain_to_dataframe(domain_dict):
     pd.DataFrame
         DataFrame where each row represents a unique combination of variable values.
     """
-    domain_name = domain_dict["domain"]["domain_name"]
-    variables = domain_dict["domain"]["variables"]
+    domain_name = domain_dict["domain_name"]
+    variables = domain_dict["variables"]
 
     # Prepare data storage
     data = []
@@ -32,11 +106,9 @@ def expand_domain_to_dataframe(domain_dict):
         var_name = details[f"{var.upper()}_name"]  # Fetch actual variable name
         var_detailed = details[f"{var.upper()}_detailed"]
 
-        p_values = [("p", key, val) for key, val in details["p_value"].items()]
+        p_values = list(details["p_value"].items())
         m_values = (
-            [("m", key, val) for key, val in details["m_value"].items()]
-            if "m_value" in details
-            else p_values  # Default to p_values if m_values are absent
+            list(details["m_value"].items()) if "m_value" in details else p_values
         )
 
         var_keys.append(var)
@@ -44,7 +116,7 @@ def expand_domain_to_dataframe(domain_dict):
         var_p_values.append(p_values)
         var_m_values.append(m_values)
 
-    # Construct only the 2^3 = 8 unique counterbalance combinations
+    # Construct all 2^3 = 8 unique counterbalance conditions
     cntbl_conditions = list(itertools.product(["p", "m"], repeat=3))
 
     for cntbl_combo in cntbl_conditions:
@@ -54,24 +126,28 @@ def expand_domain_to_dataframe(domain_dict):
         for var, var_name, cntbl, p_vals, m_vals in zip(
             var_keys, var_names, cntbl_combo, var_p_values, var_m_values
         ):
+            # Select value based on counterbalancing condition
             chosen_values = p_vals if cntbl == "p" else m_vals
-            var_cntbl, var_value, var_sense = chosen_values[
-                0
-            ]  # Select the first key-value pair
+            var_value, var_sense = chosen_values[0]  # Take first valid pair
 
             row[f"{var}"] = var_name  # Assign actual variable name
             row[f"{var}_values"] = var_value
-            row[f"{var}_cntbl"] = var_cntbl
+            row[f"{var}_cntbl"] = cntbl
             row[f"{var}_sense"] = var_sense
             row[f"{var}_detailed"] = variables[var][f"{var.upper()}_detailed"]
 
-            cntbl_cond += var_cntbl  # Concatenate all counterbalance conditions
+            cntbl_cond += cntbl  # Concatenate all counterbalance conditions
 
         row["cntbl_cond"] = cntbl_cond
         data.append(row)
 
     # Create DataFrame
     df = pd.DataFrame(data)
+
+    # Ensure all 8 unique sequences exist
+    assert sorted(df["cntbl_cond"].unique()) == sorted(
+        ["ppp", "ppm", "pmp", "pmm", "mpp", "mpm", "mmp", "mmm"]
+    ), f"Expected all 8 unique sequences, but got: {df['cntbl_cond'].unique()}"
 
     return df
 

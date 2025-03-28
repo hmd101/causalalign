@@ -12,10 +12,11 @@ def verbalize_domain_intro(domain_dict):
     str
         The introduction text of the domain.
     """
-    return domain_dict["domain"]["introduction"]
+    # return domain_dict["domain"]["introduction"]
+    return domain_dict["introduction"]
 
 
-def verbalize_causal_mechanism(domain_dict, df, graph_type, graph_structures):
+def verbalize_causal_mechanism(domain_dict, row, graph_type, graph_structures):
     """
     Construct a causal mechanism statement based on the selected graph structure.
 
@@ -38,14 +39,17 @@ def verbalize_causal_mechanism(domain_dict, df, graph_type, graph_structures):
     if graph_type in graph_structures:
         template = graph_structures[graph_type]["causal_template"]
         causal_text = template.format(
-            c1_sense=df["C1_sense"].iloc[0],
-            c1_name=df["C1"].iloc[0],
-            c2_sense=df["C2_sense"].iloc[0],
-            c2_name=df["C2"].iloc[0],
-            e_sense=df["E_sense"].iloc[0],
-            e_name=df["E"].iloc[0],
+            c1_sense=row["C1_sense"],
+            c1_name=row["C1"],
+            c2_sense=row["C2_sense"],
+            c2_name=row["C2"],
+            e_sense=row["E_sense"],
+            e_name=row["E"],
         )
-        return " Assume you live in a world that works like this: " + causal_text + "."
+        return (
+            causal_text
+            # " Assume you live in a world that works like this: " + causal_text
+        )  # + "."
     else:
         return ""
 
@@ -70,13 +74,14 @@ def verbalize_inference_task(row, nested_dict, prompt_type):
         The verbalized inference task statement.
     """
     # Extract the domain variables dictionary
-    variables_dict = nested_dict["domain"]["variables"]
+    # variables_dict = nested_dict["domain"]["variables"]
+    variables_dict = nested_dict["variables"]
 
     # Split the observations into a list
     observations = row["observation"].split(", ")
 
     # Construct the observation text
-    observation_text = " Now suppose you observe the following: "
+    observation_text = " Now suppose you observe the following:  "
     observation_descriptions = []
 
     for obs in observations:

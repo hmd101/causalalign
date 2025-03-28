@@ -1,0 +1,12 @@
+id;response;prompt_category;graph;domain;task;cntbl_cond;subject;temperature
+1;<response><likelihood>50</likelihood><confidence>75</confidence></response>;numeric-certainty;collider;abc;a;ppp;gemini-2.0-pro-exp-02-05;0.0
+2;<response><likelihood>50</likelihood><confidence>90</confidence></response>;numeric-certainty;collider;abc;a;ppp;gemini-2.0-pro-exp-02-05;0.0
+3;<response><likelihood>67</likelihood><confidence>60</confidence></response>;numeric-certainty;collider;abc;b;ppp;gemini-2.0-pro-exp-02-05;0.0
+4;<response><likelihood>67</likelihood><confidence>65</confidence></response>;numeric-certainty;collider;abc;b;ppp;gemini-2.0-pro-exp-02-05;0.0
+5;<response><likelihood>100</likelihood><confidence>95</confidence></response>;numeric-certainty;collider;abc;c;ppp;gemini-2.0-pro-exp-02-05;0.0
+6;<response><likelihood>100</likelihood><confidence>95</confidence></response>;numeric-certainty;collider;abc;c;ppp;gemini-2.0-pro-exp-02-05;0.0
+7;<response><likelihood>50</likelihood><confidence>90</confidence></response>;numeric-certainty;collider;abc;d;ppp;gemini-2.0-pro-exp-02-05;0.0
+8;<response><likelihood>50</likelihood><confidence>90</confidence></response>;numeric-certainty;collider;abc;d;ppp;gemini-2.0-pro-exp-02-05;0.0
+9;<response><likelihood>50</likelihood><confidence>90</confidence></response>;numeric-certainty;collider;abc;e;ppp;gemini-2.0-pro-exp-02-05;0.0
+10;<response><likelihood>50</likelihood><confidence>90</confidence></response>;numeric-certainty;collider;abc;e;ppp;gemini-2.0-pro-exp-02-05;0.0
+11;<response><likelihood>10</likelihood><confidence>80</confidence></response>;numeric-certainty;collider;abc;f;ppp;gemini-2.0-pro-exp-02-05;0.0
