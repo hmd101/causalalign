@@ -81,7 +81,9 @@ def verbalize_inference_task(row, nested_dict, prompt_type):
     observations = row["observation"].split(", ")
 
     # Construct the observation text
-    observation_text = " Now suppose you observe the following:  "
+    # observation_text = " Now suppose you observe the following:  "
+    observation_text = " You are currently observing: "
+
     observation_descriptions = []
 
     for obs in observations:
@@ -125,7 +127,8 @@ def verbalize_inference_task(row, nested_dict, prompt_type):
     query_sense = row[f"{query_var}_sense"]
 
     # Construct the query text
-    query_text = f" Given the observations and the causal mechanism, how likely on a scale from 0 to 100 is {query_sense} {row[query_var]}? 0 means definitely not likely and 100 means definitely likely. {prompt_type}."
-
+    # query_text = f" Given the observations and the causal mechanism, how likely on a scale from 0 to 100 is {query_sense} {row[query_var]}? 0 means completely unlikely and 100 means completely certain. {prompt_type}."
+    query_text = f" Your task is to estimate how likely it is that {query_sense} {row[query_var]} are present on a scale from 0 to 100, given the observations and causal relationships described. 0 means completely unlikely and 100 means completely certain. {prompt_type}"
+    # prompt_type = is provided in notebooks and indicates how response should be formatted and for example if CoT should be used.
     # Combine observation text and query text
     return observation_text + query_text

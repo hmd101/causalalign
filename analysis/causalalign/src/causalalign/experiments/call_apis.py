@@ -289,10 +289,14 @@ class ExperimentRunner:
 
         os.makedirs(folder_path, exist_ok=True)
 
+        response_df = pd.DataFrame(results)
+        response_df["subject"] = model_name
+        response_df["temperature"] = temperature
+
         file_name = f"{self.version}_"
         if self.combine_cnt_cond and cnt_cond is not None:
             file_name += f"{cnt_cond}_"
-        file_name += f"{model_name}_{temperature}_temp"
+        file_name += f"{model_name}_{temperature}_temp_{input_file}"
 
         if self.cot:
             file_name += "_cot"
@@ -300,60 +304,8 @@ class ExperimentRunner:
         file_name += ".csv"
         file_path = os.path.join(folder_path, file_name)
 
-        response_df = pd.DataFrame(results)
-        response_df["subject"] = model_name
-        response_df["temperature"] = temperature
-
         response_df.to_csv(file_path, index=False, sep=";")
         print(f"Responses saved to {file_path}")
-
-    # def run(
-    #     self,
-    #     input_path: str = None,
-    #     output_path: str = None,
-    #     sub_folder_xs: list = None,
-    #     temperature_value_xs: list = None,
-    # ):
-    #     """
-    #     Runs the experiment, processing input files and generating results.
-
-    #     Parameters:
-    #     -----------
-    #     input_path: str
-    #         Path to the folder containing input CSV files. If None, uses the default.
-    #     output_path: str
-    #         Path to store results. If None, uses the default results folder.
-    #     sub_folder_xs: list
-    #         List of subfolders to process.
-    #     temperature_value_xs: list
-    #         List of temperature values for LLM generation.
-    #     """
-    #     # Override paths if specified
-    #     if input_path:
-    #         self.input_path = input_path
-    #     if output_path:
-    #         self.results_folder = output_path
-
-    #     if sub_folder_xs is None or temperature_value_xs is None:
-    #         raise ValueError("sub_folder_xs and temperature_value_xs must be provided.")
-
-    #     for subfolder in sub_folder_xs:
-    #         subfolder_path = os.path.join(self.input_path, subfolder)
-    #         if not os.path.exists(subfolder_path):
-    #             print(
-    #                 f"Warning: Subfolder {subfolder_path} does not exist. Skipping..."
-    #             )
-    #             continue
-
-    #         input_files = [f for f in os.listdir(subfolder_path) if f.endswith(".csv")]
-
-    #         for input_file in input_files:
-    #             for temperature_value in temperature_value_xs:
-    #                 for provider, config in self.provider_configs.items():
-    #                     llm_client = create_llm_client(config)
-    #                     self.process_file(
-    #                         input_file, subfolder, llm_client, temperature_value
-    #                     )
 
     def run(
         self,
