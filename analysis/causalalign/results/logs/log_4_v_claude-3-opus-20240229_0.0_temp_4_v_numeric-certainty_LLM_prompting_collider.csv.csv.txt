@@ -1,5 +1,5 @@
-File: ../../../../../causalalign/results/17_rw/gpt-3.5-turbo/4_v_gpt-3.5-turbo_0.0_temp_4_v_numeric-certainty_LLM_prompting_collider.csv.csv
-Model Folder: gpt-3.5-turbo
+File: ../../../../../causalalign/results/17_rw/claude-3-opus-20240229/4_v_claude-3-opus-20240229_0.0_temp_4_v_numeric-certainty_LLM_prompting_collider.csv.csv
+Model Folder: claude-3-opus-20240229
 Temperature: 0.0
 Parsed XML: 960
 Parsed fallback CoT: 0
