@@ -1,7 +1,8 @@
 tests/
 probability/
 models/
-datasets/17_rw/*
+datasets/17_rw/human_data/*
+datasets/17_rw/merged_data/*
 llm/*
 !llm/
 !llm/*.py
