@@ -83,7 +83,7 @@ if __name__ == "__main__":
 
     # Attention: Do not flatten provider_configs
     runner = ExperimentRunner(
-        provider_configs=provider_configs, version="4_v", cot=False, n_times=4
+        provider_configs=provider_configs, version="5_v", cot=False, n_times=4
     )
 
     runner.run(

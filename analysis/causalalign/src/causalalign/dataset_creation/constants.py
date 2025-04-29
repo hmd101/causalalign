@@ -362,8 +362,8 @@ rw_17_domain_components = {
         "domain_name": "economy",
         "variables": {
             "X": {
-                "X_name": "interest rates",
-                "X_detailed": "Interest rates are the rates banks charge to loan money.",
+                "name": "interest rates",
+                "detailed": "Interest rates are the rates banks charge to loan money.",
                 "p_value": {"1": "low", "0": "normal"},
                 "m_value": {"1": "high", "0": "normal"},
                 "explanations": {
@@ -374,8 +374,8 @@ rw_17_domain_components = {
                 },
             },
             "Y": {
-                "Y_name": "trade deficits",
-                "Y_detailed": "A country's trade deficit is the difference between the value of the goods that a country imports and the value of the goods that a country exports.",
+                "name": "trade deficits",
+                "detailed": "A country's trade deficit is the difference between the value of the goods that a country imports and the value of the goods that a country exports.",
                 "p_value": {"1": "small", "0": "normal"},
                 "m_value": {"1": "large", "0": "normal"},
                 "explanations": {
@@ -386,8 +386,8 @@ rw_17_domain_components = {
                 },
             },
             "Z": {
-                "C_name": "retirement savings",
-                "C_detailed": "Retirement savings is the money people save for their retirement.",
+                "name": "retirement savings",
+                "detailed": "Retirement savings is the money people save for their retirement.",
                 "p_value": {"1": "high", "0": "normal"},
                 "m_value": {"1": "low", "0": "normal"},
             },
@@ -398,8 +398,8 @@ rw_17_domain_components = {
         "domain_name": "sociology",
         "variables": {
             "X": {
-                "X_name": "urbanization",
-                "X_detailed": "Urbanization is the degree to which the members of a society live in urban environments (i.e., cities) versus rural environments.",
+                "name": "urbanization",
+                "detailed": "Urbanization is the degree to which the members of a society live in urban environments (i.e., cities) versus rural environments.",
                 "p_value": {"1": "high", "0": "normal"},
                 "m_value": {"1": "low", "0": "normal"},
                 "explanations": {
@@ -410,8 +410,8 @@ rw_17_domain_components = {
                 },
             },
             "Y": {
-                "Y_name": "interest in religion",
-                "Y_detailed": "Interest in religion is the degree to which the members of a society show a curiosity in religion issues or participate in organized religions.",
+                "name": "interest in religion",
+                "detailed": "Interest in religion is the degree to which the members of a society show a curiosity in religion issues or participate in organized religions.",
                 "p_value": {"1": "low", "0": "normal"},
                 "m_value": {"1": "high", "0": "normal"},
                 "explanations": {
@@ -422,8 +422,8 @@ rw_17_domain_components = {
                 },
             },
             "Z": {
-                "Z_name": "socio-economic mobility",
-                "Z_detailed": "Socioeconomic mobility is the degree to which the members of a society are able to improve their social and economic status.",
+                "name": "socio-economic mobility",
+                "detailed": "Socioeconomic mobility is the degree to which the members of a society are able to improve their social and economic status.",
                 "p_value": {"1": "high", "0": "normal"},
                 "m_value": {"1": "low", "0": "normal"},
             },
@@ -434,23 +434,24 @@ rw_17_domain_components = {
         "domain_name": "weather",
         "variables": {
             "X": {
-                "X_name": "ozone levels",
-                "X_detailed": "Ozone is a gaseous allotrope of oxygen (O3) and is formed by exposure to UV radiation.",
-                "p_value": {"1": "low", "0": "normal"},
-                "m_value": {"1": "high", "0": "normal"},
+                "name": "ozone levels",
+                "detailed": "Ozone is a gaseous allotrope of oxygen (O3) and is formed by exposure to UV radiation.",
+                "p_value": {"1": "high", "0": "normal"},
+                "m_value": {"1": "low", "0": "normal"},
                 # Note: this is graph dependent. the explanations below are based on the collider graph
                 "explanations": {
-                    "p_p": "Ozone attracts extra oxygen atoms from water molecules, creating a concentration of water vapor in that region.",
-                    "p_m": "Ozone accepts extra oxygen atoms, decreasing the amount of oxygen available to form water molecules. With fewer water molecules, there is lower humidity.",
+                    "p_m": "Ozone attracts extra oxygen atoms from water molecules, creating a concentration of water vapor in that region.",
+                    # "p_p": "Ozone accepts extra oxygen atoms, decreasing the amount of oxygen available to form water molecules. With fewer water molecules, there is lower humidity.",
+                    "p_p": "Ozone tends to rapidly break down into normal oxygen, leaving more oxygen available for the formation of water molecules (H2O).",
                     "m_p": "The oxygen atoms that would normally be part of ozone molecules are free to combine with hydrogen atoms instead, creating water molecules.",
                     "m_m": "The low amount of ozone allows a large number of ultra-violet (UV) rays to enter the atmosphere, and the UV rays break up water molecules, resulting in low humidity.",
                 },
             },
             "Y": {
-                "Y_name": "air pressure",
-                "Y_detailed": "Air pressure is force exerted due to concentrations of air molecules.",
-                "p_value": {"1": "high", "0": "normal"},
-                "m_value": {"1": "low", "0": "normal"},
+                "name": "air pressure",
+                "detailed": "Air pressure is force exerted due to concentrations of air molecules.",
+                "p_value": {"1": "low", "0": "normal"},
+                "m_value": {"1": "high", "0": "normal"},
                 # Note: this is graph dependent. the explanations below are based on the collider graph
                 "explanations": {
                     "p_p": "When pressure does not force water vapor to break into oxygen and hydrogen atoms, water vapor remains in abundance.",
@@ -460,8 +461,8 @@ rw_17_domain_components = {
                 },
             },
             "Z": {
-                "Z_name": "humidity",
-                "Z_detailed": "Humidity is the degree to which the atmosphere contains water molecules.",
+                "name": "humidity",
+                "detailed": "Humidity is the degree to which the atmosphere contains water molecules.",
                 "p_value": {"1": "high", "0": "normal"},
                 "m_value": {"1": "low", "0": "normal"},
             },
