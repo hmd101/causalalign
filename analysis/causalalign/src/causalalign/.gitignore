@@ -8,3 +8,4 @@ llm/*
 !llm/*.py
 graph/
 examples/
+data
