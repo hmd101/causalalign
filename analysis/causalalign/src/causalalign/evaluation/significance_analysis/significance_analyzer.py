@@ -1,14 +1,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from scipy import stats
+from scipy.stats import kruskal, levene, pearsonr, shapiro, spearmanr
 import seaborn as sns
+from sklearn.linear_model import LinearRegression
 
 # from statsmodels.stats.mixed_lm import MixedLM
 # In significance_analyzer.py
 import statsmodels.regression.mixed_linear_model as mlm
-from scipy import stats
-from scipy.stats import kruskal, levene, pearsonr, shapiro, spearmanr
-from sklearn.linear_model import LinearRegression
 
 MixedLM = mlm.MixedLM
 
@@ -1181,6 +1181,95 @@ class CausalReasoningAnalysis:
                                 result[groupby_cols[0]] = name
 
                             results.append(result)
+
+                else:
+                    # No grouping, just match all data, referred to as "pooled" in the paper
+                    matched_data = pd.merge(
+                        humans[match_columns + ["response"]],
+                        temp_data[match_columns + ["response"]],
+                        on=match_columns,
+                        suffixes=("_human", "_llm"),
+                    )
+
+                    matched_data = matched_data.dropna(
+                        subset=["response_human", "response_llm"]
+                    )
+
+                    if len(matched_data) < 2:
+                        print(
+                            f"Skipping correlation: Not enough samples (N={len(matched_data)})"
+                        )
+                        corr, p = np.nan, np.nan
+                        method = None
+                    else:
+                        llm_std = matched_data["response_llm"].std()
+                        human_std = matched_data["response_human"].std()
+
+                        if llm_std < epsilon:
+                            matched_data["response_llm"] += np.random.uniform(
+                                epsilon_lower, epsilon_upper, size=len(matched_data)
+                            )
+                            print(
+                                "Added small noise to LLM responses (Low variance detected)"
+                            )
+                        if human_std < epsilon:
+                            matched_data["response_human"] += np.random.uniform(
+                                epsilon_lower, epsilon_upper, size=len(matched_data)
+                            )
+                            print(
+                                "Added small noise to Human responses (Low variance detected)"
+                            )
+
+                        if (
+                            matched_data["response_llm"].std() == 0
+                            or matched_data["response_human"].std() == 0
+                        ):
+                            print(
+                                "Skipping due to zero variance after noise adjustment"
+                            )
+                            corr, p = np.nan, np.nan
+                            method = None
+                        else:
+                            if len(matched_data) >= 3:
+                                _, h_pval = shapiro(matched_data["response_human"])
+                                _, l_pval = shapiro(matched_data["response_llm"])
+                                is_normal = h_pval > 0.05 and l_pval > 0.05
+                            else:
+                                is_normal = False
+
+                            if is_normal:
+                                corr, p = pearsonr(
+                                    matched_data["response_human"],
+                                    matched_data["response_llm"],
+                                )
+                                method = "pearson"
+                            else:
+                                matched_data["response_llm"] += np.random.uniform(
+                                    1e-6, 1e-5, size=len(matched_data)
+                                )
+                                corr, p = spearmanr(
+                                    matched_data["response_human"],
+                                    matched_data["response_llm"],
+                                )
+                                method = "spearman"
+
+                    print("\n- -- Debug Info ---")
+                    print(f"LLM: {llm} | Temperature: {temp}")
+                    print(f"Matched Data Samples: {len(matched_data)}")
+                    print(f"LLM Std Dev: {matched_data['response_llm'].std()}")
+                    print(f"Human Std Dev: {matched_data['response_human'].std()}")
+                    print(f"Computed Correlation: {corr}")
+
+                    result = {
+                        "LLM": llm,
+                        "Temperature": temp,
+                        "Correlation": corr,
+                        "P_value": p,
+                        "Method": method,
+                        "N": len(matched_data),
+                    }
+
+                    results.append(result)
 
         return pd.DataFrame(results)
 

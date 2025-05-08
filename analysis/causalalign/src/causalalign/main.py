@@ -18,10 +18,11 @@ Usage:
     Run the script to execute the experiment with the configured providers.
 """
 
+from dotenv import load_dotenv
+
 # from analysis.causalalign.src.causalalign.experiments.call_apis import ExperimentRunner
 from causalalign.experiments.call_apis import ExperimentRunner
 from causalalign.llm.client import LLMConfig
-from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
@@ -47,7 +48,7 @@ if __name__ == "__main__":
     ]  # "gpt-4.5"  Error code: 404
     google_models = [
         "gemini-1.5-pro",
-        "gemini-2.0-pro-exp-02-05",  # uncomment!
+        # "gemini-2.0-pro-exp-02-05",  # uncomment!
     ]
     anthropic_models = [
         # "claude-3-sonnet", # Claude API error: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'messages.0: all messages must have non-empty content except for the optional final assistant message'}}
@@ -83,7 +84,7 @@ if __name__ == "__main__":
 
     # Attention: Do not flatten provider_configs
     runner = ExperimentRunner(
-        provider_configs=provider_configs, version="5_v", cot=False, n_times=4
+        provider_configs=provider_configs, version="6_v", cot=False, n_times=1
     )
 
     runner.run(
